@@ -2,14 +2,26 @@ import React, { useEffect, useState, useMemo } from 'react';
 
 export default function ParallaxBackground() {
   const [scrollY, setScrollY] = useState(0);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  // Function to calculate responsive size based on screen width
+  const getResponsiveSize = (baseSize: number) => {
+    const breakpoint = 768; // mobile breakpoint
+    if (windowWidth <= breakpoint) {
+      return baseSize * 0.5; // 50% of original size for mobile
+    } else if (windowWidth <= 1024) {
+      return baseSize * 0.75; // 75% of original size for tablets/small laptops
+    }
+    return baseSize; // original size for large screens
+  };
 
   const circles = useMemo(() => {
     return [
       {
         label: 'Circle 1', // Closest circle
-        size: 750,
+        baseSize: 750,
         initialLeft: -15,
-        initialTop: 25, // Changed to be a percentage of viewport height
+        initialTop: 25,
         speed: 0.75,
         color: 'rgba(139, 115, 85, 1)',
         opacity: 0.3,
@@ -17,7 +29,7 @@ export default function ParallaxBackground() {
       },
       {
         label: 'Circle 2',
-        size: 400,
+        baseSize: 400,
         initialLeft: 70,
         initialTop: 600,
         speed: 0.3,
@@ -27,7 +39,7 @@ export default function ParallaxBackground() {
       },
       {
         label: 'Circle 3',
-        size: 250,
+        baseSize: 250,
         initialLeft: 40,
         initialTop: 900,
         speed: 0.2,
@@ -37,7 +49,7 @@ export default function ParallaxBackground() {
       },
       {
         label: 'Circle 4',
-        size: 160,
+        baseSize: 160,
         initialLeft: 20,
         initialTop: 1400,
         speed: 0.05,
@@ -47,7 +59,7 @@ export default function ParallaxBackground() {
       },
       {
         label: 'Circle 5',
-        size: 180,
+        baseSize: 180,
         initialLeft: 80,
         initialTop: 1500,
         speed: 0.1,
@@ -57,7 +69,7 @@ export default function ParallaxBackground() {
       },
       {
         label: 'Circle 6',
-        size: 160,
+        baseSize: 160,
         initialLeft: 50,
         initialTop: 1800,
         speed: 0.05,
@@ -67,7 +79,7 @@ export default function ParallaxBackground() {
       },
       {
         label: 'Circle 7', // Farthest circle
-        size: 1140,
+        baseSize: 1140,
         initialLeft: 65,
         initialTop: 2000,
         speed: 0.2,
@@ -84,8 +96,20 @@ export default function ParallaxBackground() {
         setScrollY(window.scrollY);
       });
     };
+
+    const handleResize = () => {
+      requestAnimationFrame(() => {
+        setWindowWidth(window.innerWidth);
+      });
+    };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
 
   return (
@@ -98,8 +122,8 @@ export default function ParallaxBackground() {
           key={i}
           className="absolute rounded-full will-change-transform"
           style={{
-            width: `${circle.size}px`,
-            height: `${circle.size}px`,
+            width: `${getResponsiveSize(circle.baseSize)}px`,
+            height: `${getResponsiveSize(circle.baseSize)}px`,
             left: `${circle.initialLeft}%`,
             top: `${circle.initialTop}px`,
             backgroundColor: circle.color,
