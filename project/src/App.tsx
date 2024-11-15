@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
-import SideMenu from './components/SideMenu';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import ParallaxBackground from './components/ParallaxBackground';
+import SideMenu from './components/SideMenu';
 import ScrollReveal from './components/ScrollReveal';
+import Resume from './pages/Resume';
+import { useState } from 'react';
 import ProjectCard from './components/ProjectCard';
 import { ChevronDown, Terminal } from 'lucide-react';
 
@@ -26,14 +28,9 @@ const projects = [
   },
 ];
 
-function App() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+function Home() {
   return (
-    <div className="min-h-screen bg-[#F5EDE0]">
-      <SideMenu isOpen={isMenuOpen} toggleMenu={() => setIsMenuOpen(!isMenuOpen)} />
-      <ParallaxBackground />
-
+    <>
       {/* Hero Section */}
       <section className="min-h-screen flex items-center justify-center relative px-4">
         <ScrollReveal className="text-center">
@@ -51,7 +48,7 @@ function App() {
       </section>
 
       {/* About Section */}
-      <section id="about" className="min-h-screen flex items-center py-20 px-4 md:px-20">
+      <section id="about" className="min-h-screen py-20 px-4 md:px-20">
         <div className="max-w-4xl mx-auto">
           <ScrollReveal>
             <h2 className="text-4xl font-bold text-[#2C1810] mb-8">About Me</h2>
@@ -130,7 +127,28 @@ function App() {
           </ScrollReveal>
         </div>
       </section>
-    </div>
+    </>
+  );
+}
+
+function App() {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  return (
+    <Router>
+      <div className="relative min-h-screen bg-[#F5EDE0]">
+        <ParallaxBackground />
+        <SideMenu isOpen={isMenuOpen} toggleMenu={() => setIsMenuOpen(!isMenuOpen)} />
+        
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/resume" element={<Resume />} />
+          <Route path="/about" element={<Home />} />
+          <Route path="/projects" element={<Home />} />
+          <Route path="/contact" element={<Home />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
