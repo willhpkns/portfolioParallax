@@ -4,11 +4,13 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   @apply antialiased;
   perspective: 1000px;
+  overflow-x: hidden;
 }
 
 .delay-100 { animation-delay: 100ms; }
