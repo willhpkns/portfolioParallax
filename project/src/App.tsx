@@ -7,19 +7,19 @@ import { ChevronDown, Terminal } from 'lucide-react';
 
 const projects = [
   {
-    title: 'E-Commerce Platform',
+    title: 'Test1',
     description: 'A modern e-commerce platform built with React and Node.js, featuring real-time updates and cart management.',
     image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=800',
     technologies: ['React', 'Node.js', 'MongoDB'],
   },
   {
-    title: 'AI Chat Application',
+    title: 'Test2',
     description: 'Real-time chat application powered by AI for smart responses and language translation.',
     image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=800',
     technologies: ['Python', 'TensorFlow', 'WebSocket'],
   },
   {
-    title: 'Cloud Dashboard',
+    title: 'Test3',
     description: 'Analytics dashboard for cloud infrastructure monitoring with real-time metrics.',
     image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800',
     technologies: ['Vue.js', 'D3.js', 'AWS'],
