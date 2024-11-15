@@ -67,9 +67,9 @@ export default function ParallaxBackground() {
       },
       {
         label: 'Circle 7', // Farthest circle
-        size: 140,
+        size: 1140,
         initialLeft: 65,
-        initialTop: 2100,
+        initialTop: 2000,
         speed: 0.2,
         color: 'rgba(44, 24, 16, 0.4)',
         opacity: 0.4,
