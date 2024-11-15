@@ -5,6 +5,7 @@ import ScrollReveal from './components/ScrollReveal';
 import Resume from './pages/Resume';
 import { useState } from 'react';
 import ProjectCard from './components/ProjectCard';
+import ContactForm from './components/ContactForm';
 import { ChevronDown, Terminal } from 'lucide-react';
 
 const projects = [
@@ -101,29 +102,7 @@ function Home() {
             </p>
           </ScrollReveal>
           <ScrollReveal>
-            <form className="max-w-lg mx-auto space-y-6">
-              <input
-                type="text"
-                placeholder="Your Name"
-                className="w-full p-3 rounded-lg bg-white border border-[#8B7355] focus:outline-none focus:ring-2 focus:ring-[#5C4B37]"
-              />
-              <input
-                type="email"
-                placeholder="Your Email"
-                className="w-full p-3 rounded-lg bg-white border border-[#8B7355] focus:outline-none focus:ring-2 focus:ring-[#5C4B37]"
-              />
-              <textarea
-                placeholder="Your Message"
-                rows={6}
-                className="w-full p-3 rounded-lg bg-white border border-[#8B7355] focus:outline-none focus:ring-2 focus:ring-[#5C4B37]"
-              ></textarea>
-              <button
-                type="submit"
-                className="w-full py-3 px-6 bg-[#2C1810] text-white rounded-lg hover:bg-[#3D2A1F] transition-colors duration-300"
-              >
-                Send Message
-              </button>
-            </form>
+            <ContactForm />
           </ScrollReveal>
         </div>
       </section>
