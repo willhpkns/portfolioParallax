@@ -4,63 +4,62 @@ export default function ParallaxBackground() {
   const [scrollY, setScrollY] = useState(0);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-  // Function to calculate responsive size based on screen width
   const getResponsiveSize = (baseSize: number) => {
-    const breakpoint = 768; // mobile breakpoint
+    const breakpoint = 768;
     if (windowWidth <= breakpoint) {
-      return baseSize * 0.5; // 50% of original size for mobile
+      return baseSize * 0.5;
     } else if (windowWidth <= 1024) {
-      return baseSize * 0.75; // 75% of original size for tablets/small laptops
+      return baseSize * 0.75;
     }
-    return baseSize; // original size for large screens
+    return baseSize;
   };
 
   const circles = useMemo(() => {
     return [
       {
-        label: 'Circle 1', // Closest circle
-        baseSize: 750,
-        initialLeft: -15,
-        initialTop: 25,
-        speed: 0.75,
+        label: 'Foreground Circle',
+        baseSize: 1100,
+        initialLeft: -30,
+        initialTop: -600,
+        speed: 0.4,
         color: 'rgba(139, 115, 85, 1)',
         opacity: 0.3,
         depth: 1,
       },
       {
-        label: 'Circle 2',
-        baseSize: 400,
-        initialLeft: 70,
-        initialTop: 600,
-        speed: 0.3,
+        label: 'Mid-layer Circle 1',
+        baseSize: 450,
+        initialLeft: 75,
+        initialTop: 500,
+        speed: 0.25,
         color: 'rgba(139, 115, 85, 0.9)',
         opacity: 0.9,
         depth: 1.5,
       },
       {
-        label: 'Circle 3',
-        baseSize: 250,
-        initialLeft: 40,
-        initialTop: 900,
+        label: 'Mid-layer Circle 2',
+        baseSize: 350,
+        initialLeft: 10,
+        initialTop: 800,
         speed: 0.2,
         color: 'rgba(92, 75, 55, 0.8)',
         opacity: 0.8,
         depth: 2,
       },
       {
-        label: 'Circle 4',
-        baseSize: 160,
-        initialLeft: 20,
-        initialTop: 1400,
-        speed: 0.05,
+        label: 'Mid-layer Circle 3',
+        baseSize: 300,
+        initialLeft: 60,
+        initialTop: 1200,
+        speed: 0.15,
         color: 'rgba(92, 75, 55, 0.7)',
         opacity: 0.7,
         depth: 2.5,
       },
       {
-        label: 'Circle 5',
-        baseSize: 180,
-        initialLeft: 80,
+        label: 'Background Circle 1',
+        baseSize: 800,
+        initialLeft: -20,
         initialTop: 1500,
         speed: 0.1,
         color: 'rgba(44, 24, 16, 0.6)',
@@ -68,8 +67,8 @@ export default function ParallaxBackground() {
         depth: 3,
       },
       {
-        label: 'Circle 6',
-        baseSize: 160,
+        label: 'Background Circle 2',
+        baseSize: 700,
         initialLeft: 50,
         initialTop: 1800,
         speed: 0.05,
@@ -78,11 +77,11 @@ export default function ParallaxBackground() {
         depth: 3.5,
       },
       {
-        label: 'Circle 7', // Farthest circle
-        baseSize: 1140,
-        initialLeft: 65,
-        initialTop: 2000,
-        speed: 0.2,
+        label: 'Far Background Circle',
+        baseSize: 900,
+        initialLeft: 70,
+        initialTop: 2200,
+        speed: 0.02,
         color: 'rgba(44, 24, 16, 0.4)',
         opacity: 0.4,
         depth: 4,
