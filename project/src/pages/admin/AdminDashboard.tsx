@@ -140,6 +140,13 @@ export default function AdminDashboard() {
               <Award className="text-[#2C1810]" size={24} />
               <span>Update Skills</span>
             </a>
+            <a
+              href="/admin/education"
+              className="flex items-center gap-3 p-4 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow"
+            >
+              <GraduationCap className="text-[#2C1810]" size={24} />
+              <span>Manage Education</span>
+            </a>
           </div>
         </div>
       </div>

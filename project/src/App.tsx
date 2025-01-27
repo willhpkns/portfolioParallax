@@ -7,6 +7,9 @@ import AdminLogin from './pages/admin/AdminLogin';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AboutManager from './pages/admin/AboutManager';
 import ProjectsManager from './pages/admin/ProjectsManager';
+import EducationManager from './pages/admin/EducationManager';
+import SkillsManager from './pages/admin/SkillsManager';
+import ExperienceManager from './pages/admin/ExperienceManager';
 import SideMenu from './components/SideMenu';
 import ScrollReveal from './components/ScrollReveal';
 import Resume from './pages/Resume';
@@ -174,6 +177,9 @@ function App() {
             <Route path="/admin/dashboard" element={<AdminDashboard />} />
             <Route path="/admin/about" element={<AboutManager />} />
             <Route path="/admin/projects" element={<ProjectsManager />} />
+            <Route path="/admin/education" element={<EducationManager />} />
+            <Route path="/admin/skills" element={<SkillsManager />} />
+            <Route path="/admin/experience" element={<ExperienceManager />} />
           </Route>
         </Routes>
         <ScrollToTop />
