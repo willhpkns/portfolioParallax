@@ -3,10 +3,10 @@ import ParallaxBackground from './components/ParallaxBackground';
 import SideMenu from './components/SideMenu';
 import ScrollReveal from './components/ScrollReveal';
 import Resume from './pages/Resume';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ProjectCard from './components/ProjectCard';
 import ContactForm from './components/ContactForm';
-import { ChevronDown, Terminal } from 'lucide-react';
+import { ChevronDown, Terminal, ChevronUp } from 'lucide-react';
 
 const projects = [
   {
@@ -28,6 +28,38 @@ const projects = [
     technologies: ['Vue.js', 'D3.js', 'AWS'],
   },
 ];
+
+const ScrollToTop = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const toggleVisibility = () => {
+      if (window.scrollY > 300) {
+        setIsVisible(true);
+      } else {
+        setIsVisible(false);
+      }
+    };
+    window.addEventListener("scroll", toggleVisibility);
+    return () => window.removeEventListener("scroll", toggleVisibility);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  return isVisible ? (
+    <button
+      onClick={scrollToTop}
+      className="fixed bottom-32 md:bottom-8 right-8 p-3 rounded-full bg-[#2C1810] text-[#F5EDE0] shadow-lg transition-opacity duration-300 hover:bg-[#5C4B37] z-50"
+    >
+      <ChevronUp size={24} />
+    </button>
+  ) : null;
+};
 
 function Home() {
   return (
@@ -128,6 +160,7 @@ function App() {
           <Route path="/projects" element={<Home />} />
           <Route path="/contact" element={<Home />} />
         </Routes>
+        <ScrollToTop />
       </div>
     </Router>
   );
