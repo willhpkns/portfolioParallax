@@ -54,7 +54,7 @@ const ScrollToTop = () => {
   return isVisible ? (
     <button
       onClick={scrollToTop}
-      className="fixed bottom-32 md:bottom-8 right-8 p-3 rounded-full bg-[#2C1810] text-[#F5EDE0] shadow-lg transition-opacity duration-300 hover:bg-[#5C4B37] z-50"
+      className="fixed bottom-8 right-8 p-3 rounded-full bg-[#2C1810] text-[#F5EDE0] shadow-lg transition-opacity duration-300 hover:bg-[#5C4B37] z-50 hidden md:block"
     >
       <ChevronUp size={24} />
     </button>
