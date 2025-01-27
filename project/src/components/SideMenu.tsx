@@ -53,7 +53,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, toggleMenu }) => {
     <>
       <button
         onClick={toggleMenu}
-        className="fixed top-4 right-4 rounded-lg bg-[#E6D5AC] p-3 text-[#2C1810] hover:bg-[#2C1810] hover:text-[#E6D5AC] transition-all duration-300 shadow-lg hover:shadow-xl"
+        className="fixed top-4 right-4 rounded-lg bg-[#E6D5AC] p-3 text-[#2C1810] hover:bg-[#2C1810] hover:text-white transition-all duration-300 shadow-lg hover:shadow-xl"
         style={{
           position: 'fixed',
           zIndex: 99999,
