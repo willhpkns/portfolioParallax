@@ -67,6 +67,9 @@ class ContentApi {
     });
 
     if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error('No authentication token, access denied');
+      }
       throw new Error('API request failed');
     }
 

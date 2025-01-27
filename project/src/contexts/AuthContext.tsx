@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { aboutApi, projectApi, educationApi, experienceApi, skillsApi } from '../services/api';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -19,13 +20,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(!!token);
   const navigate = useNavigate();
 
+  // Initialize token state for APIs on mount
+  useEffect(() => {
+    const currentToken = localStorage.getItem('token');
+    if (currentToken) {
+      setToken(currentToken);
+    }
+  }, []);
+
   useEffect(() => {
     if (token) {
       localStorage.setItem('token', token);
       setIsAuthenticated(true);
+      // Set token on all content APIs
+      aboutApi.setToken(token);
+      projectApi.setToken(token);
+      educationApi.setToken(token);
+      experienceApi.setToken(token);
+      skillsApi.setToken(token);
     } else {
       localStorage.removeItem('token');
       setIsAuthenticated(false);
+      // Clear token from all content APIs
+      aboutApi.setToken(null);
+      projectApi.setToken(null);
+      educationApi.setToken(null);
+      experienceApi.setToken(null);
+      skillsApi.setToken(null);
     }
   }, [token]);
 
