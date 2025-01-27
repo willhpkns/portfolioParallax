@@ -83,10 +83,15 @@ export const aboutApi = new class extends ContentApi {
     return this.fetchApi('/about');
   }
 
-  async update(description: string[]) {
+  async update(data: {
+    name: string;
+    position: string;
+    description: string[];
+    profileImage: string;
+  }) {
     return this.fetchApi('/about', {
       method: 'POST',
-      body: JSON.stringify({ description }),
+      body: JSON.stringify(data),
     });
   }
 };

@@ -73,19 +73,34 @@ const ScrollToTop = () => {
 };
 
 function Home() {
-  const [aboutContent, setAboutContent] = useState<string[]>([]);
+  const [aboutData, setAboutData] = useState<{
+    name: string;
+    position: string;
+    description: string[];
+    profileImage: string;
+  }>({
+    name: "",
+    position: "",
+    description: [],
+    profileImage: ""
+  });
 
   useEffect(() => {
-    const fetchAboutContent = async () => {
+    const fetchAboutData = async () => {
       try {
         const data = await aboutApi.get();
-        setAboutContent(data?.description || []);
+        setAboutData({
+          name: data?.name || "",
+          position: data?.position || "",
+          description: data?.description || [],
+          profileImage: data?.profileImage || ""
+        });
       } catch (error) {
         console.error('Error fetching about content:', error);
       }
     };
 
-    fetchAboutContent();
+    fetchAboutData();
   }, []);
 
   return (
@@ -95,10 +110,10 @@ function Home() {
         <ScrollReveal className="text-center">
           <Terminal className="mx-auto mb-6 text-[#2C1810]" size={48} />
           <h1 className="text-5xl md:text-7xl font-bold text-[#2C1810] mb-4">
-            Beatrice Prayogo
+            {aboutData.name || "Loading..."}
           </h1>
           <p className="text-xl md:text-2xl text-[#5C4B37] mb-8">
-            Full Stack Engineer
+            {aboutData.position || "Loading..."}
           </p>
         </ScrollReveal>
         <div className="animate-bounce absolute bottom-8 left-1/2 transform -translate-x-1/2">
@@ -115,18 +130,18 @@ function Home() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <ScrollReveal>
               <img
-                src="https://plus.unsplash.com/premium_vector-1730832937938-74637e0bd0c5?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+                src={aboutData.profileImage}
                 alt="Profile"
-                className="rounded-lg shadow-xl"
+                className="rounded-lg shadow-xl w-full h-auto object-cover"
               />
             </ScrollReveal>
             <div className="space-y-4 text-black bg-[#E6D5AC]/60 p-6 rounded-lg backdrop-blur-sm">
-              {aboutContent.map((paragraph, index) => (
+              {aboutData.description.map((paragraph, index) => (
                 <ScrollReveal key={index}>
                   <p className="text-lg">{paragraph}</p>
                 </ScrollReveal>
               ))}
-              {aboutContent.length === 0 && (
+              {aboutData.description.length === 0 && (
                 <ScrollReveal>
                   <p className="text-lg">Loading about content...</p>
                 </ScrollReveal>

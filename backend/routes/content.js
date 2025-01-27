@@ -21,7 +21,10 @@ router.post('/about', auth, async (req, res) => {
   try {
     let about = await About.findOne();
     if (about) {
+      about.name = req.body.name;
+      about.position = req.body.position;
       about.description = req.body.description;
+      about.profileImage = req.body.profileImage;
       await about.save();
     } else {
       about = await About.create(req.body);
