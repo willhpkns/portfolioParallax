@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { Toaster } from 'react-hot-toast';
+import { aboutApi } from './services/api';
 import ParallaxBackground from './components/ParallaxBackground';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminLogin from './pages/admin/AdminLogin';
@@ -72,6 +73,21 @@ const ScrollToTop = () => {
 };
 
 function Home() {
+  const [aboutContent, setAboutContent] = useState<string[]>([]);
+
+  useEffect(() => {
+    const fetchAboutContent = async () => {
+      try {
+        const data = await aboutApi.get();
+        setAboutContent(data?.description || []);
+      } catch (error) {
+        console.error('Error fetching about content:', error);
+      }
+    };
+
+    fetchAboutContent();
+  }, []);
+
   return (
     <>
       {/* Hero Section */}
@@ -105,16 +121,16 @@ function Home() {
               />
             </ScrollReveal>
             <div className="space-y-4 text-black bg-[#E6D5AC]/60 p-6 rounded-lg backdrop-blur-sm">
-              <ScrollReveal>
-                <p className="text-lg">
-                  My Name is Beatrice and I'm a Full Stack Engineer based in Jakarta, Indonesia.
-                </p>
-              </ScrollReveal>
-              <ScrollReveal>
-                <p className="text-lg">
-                  When I'm not coding, you can find me exploring new places, trying out new recipes, or reading a book.
-                </p>
-              </ScrollReveal>
+              {aboutContent.map((paragraph, index) => (
+                <ScrollReveal key={index}>
+                  <p className="text-lg">{paragraph}</p>
+                </ScrollReveal>
+              ))}
+              {aboutContent.length === 0 && (
+                <ScrollReveal>
+                  <p className="text-lg">Loading about content...</p>
+                </ScrollReveal>
+              )}
             </div>
           </div>
         </div>
