@@ -1,5 +1,12 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './contexts/AuthContext';
+import { Toaster } from 'react-hot-toast';
 import ParallaxBackground from './components/ParallaxBackground';
+import ProtectedRoute from './components/ProtectedRoute';
+import AdminLogin from './pages/admin/AdminLogin';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AboutManager from './pages/admin/AboutManager';
+import ProjectsManager from './pages/admin/ProjectsManager';
 import SideMenu from './components/SideMenu';
 import ScrollReveal from './components/ScrollReveal';
 import Resume from './pages/Resume';
@@ -147,6 +154,7 @@ function App() {
 
   return (
     <Router>
+      <AuthProvider>
       <div className="relative min-h-screen bg-[#F5EDE0] overflow-hidden">
         <ParallaxBackground />
         <div className="relative z-50">
@@ -159,9 +167,19 @@ function App() {
           <Route path="/about" element={<Home />} />
           <Route path="/projects" element={<Home />} />
           <Route path="/contact" element={<Home />} />
+          
+          {/* Admin Routes */}
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            <Route path="/admin/about" element={<AboutManager />} />
+            <Route path="/admin/projects" element={<ProjectsManager />} />
+          </Route>
         </Routes>
         <ScrollToTop />
+        <Toaster position="top-right" />
       </div>
+      </AuthProvider>
     </Router>
   );
 }
