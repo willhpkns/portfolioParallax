@@ -115,9 +115,11 @@ function App() {
 
   return (
     <Router>
-      <div className="relative min-h-screen bg-[#F5EDE0]">
+      <div className="relative min-h-screen bg-[#F5EDE0] overflow-hidden">
         <ParallaxBackground />
-        <SideMenu isOpen={isMenuOpen} toggleMenu={() => setIsMenuOpen(!isMenuOpen)} />
+        <div className="relative z-50">
+          <SideMenu isOpen={isMenuOpen} toggleMenu={() => setIsMenuOpen(!isMenuOpen)} />
+        </div>
         
         <Routes>
           <Route path="/" element={<Home />} />
