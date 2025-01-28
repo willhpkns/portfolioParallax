@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { educationApi } from '../../services/api';
 import toast from 'react-hot-toast';
-import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, GripVertical } from 'lucide-react';
+import { DraggableItems } from '../../components/admin/DraggableItems';
 
 interface Education {
   _id: string;
@@ -12,6 +13,7 @@ interface Education {
   startDate: string;
   endDate: string;
   description: string;
+  order: number;
 }
 
 interface EducationFormData {
@@ -86,6 +88,15 @@ export default function EducationManager() {
     }
   };
 
+  const handleOrderChange = async (newOrder: Education[]) => {
+    try {
+      await educationApi.reorder(newOrder);
+      setEducation(newOrder);
+    } catch (error) {
+      toast.error('Failed to update order');
+    }
+  };
+
   const resetForm = () => {
     setIsEditing(false);
     setCurrentEducation({
@@ -97,6 +108,41 @@ export default function EducationManager() {
       description: ''
     });
   };
+
+  const renderEducationItem = (edu: Education) => (
+    <div className="bg-white p-6 rounded-lg shadow-md group">
+      <div className="flex justify-between items-start">
+        <div>
+          <div className="flex items-center gap-2">
+            <GripVertical className="text-gray-400 opacity-0 group-hover:opacity-100 cursor-grab" size={20} />
+            <div>
+              <h3 className="text-xl font-semibold text-[#2C1810]">{edu.institution}</h3>
+              <p className="text-gray-600">{edu.degree} in {edu.field}</p>
+              <p className="text-gray-500">
+                {new Date(edu.startDate).toLocaleDateString()} - 
+                {edu.endDate ? new Date(edu.endDate).toLocaleDateString() : 'Present'}
+              </p>
+              <p className="mt-2 text-gray-700">{edu.description}</p>
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleEdit(edu)}
+            className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
+          >
+            <Edit2 size={20} />
+          </button>
+          <button
+            onClick={() => handleDelete(edu._id)}
+            className="p-2 text-red-600 hover:bg-red-50 rounded-full"
+          >
+            <Trash2 size={20} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <AdminLayout>
@@ -195,37 +241,11 @@ export default function EducationManager() {
         {loading ? (
           <div className="text-center">Loading...</div>
         ) : (
-          <div className="grid gap-4">
-            {education.map((edu) => (
-              <div key={edu._id} className="bg-white p-6 rounded-lg shadow-md">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-xl font-semibold text-[#2C1810]">{edu.institution}</h3>
-                    <p className="text-gray-600">{edu.degree} in {edu.field}</p>
-                    <p className="text-gray-500">
-                      {new Date(edu.startDate).toLocaleDateString()} - 
-                      {edu.endDate ? new Date(edu.endDate).toLocaleDateString() : 'Present'}
-                    </p>
-                    <p className="mt-2 text-gray-700">{edu.description}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEdit(edu)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
-                    >
-                      <Edit2 size={20} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(edu._id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-full"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <DraggableItems
+            items={education}
+            onOrderChange={handleOrderChange}
+            renderItem={renderEducationItem}
+          />
         )}
       </div>
     </AdminLayout>

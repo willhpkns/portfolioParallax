@@ -104,9 +104,27 @@ router.delete('/projects/:id', auth, async (req, res) => {
 });
 
 // Education Routes
+// Education order update endpoint
+router.put('/education/reorder', auth, async (req, res) => {
+  try {
+    const { items } = req.body;
+    const bulkOps = items.map((item, index) => ({
+      updateOne: {
+        filter: { _id: item._id },
+        update: { $set: { order: index } }
+      }
+    }));
+    await Education.bulkWrite(bulkOps);
+    res.json({ message: 'Education order updated successfully' });
+  } catch (err) {
+    console.error('Error updating education order:', err);
+    res.status(500).json({ message: 'Error updating education order' });
+  }
+});
+
 router.get('/education', async (req, res) => {
   try {
-    const education = await Education.find().sort('-createdAt');
+    const education = await Education.find().sort('order');
     res.json(education);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching education data' });
@@ -151,9 +169,27 @@ router.delete('/education/:id', auth, async (req, res) => {
 });
 
 // Experience Routes
+// Experience order update endpoint
+router.put('/experience/reorder', auth, async (req, res) => {
+  try {
+    const { items } = req.body;
+    const bulkOps = items.map((item, index) => ({
+      updateOne: {
+        filter: { _id: item._id },
+        update: { $set: { order: index } }
+      }
+    }));
+    await Experience.bulkWrite(bulkOps);
+    res.json({ message: 'Experience order updated successfully' });
+  } catch (err) {
+    console.error('Error updating experience order:', err);
+    res.status(500).json({ message: 'Error updating experience order' });
+  }
+});
+
 router.get('/experience', async (req, res) => {
   try {
-    const experience = await Experience.find().sort('-createdAt');
+    const experience = await Experience.find().sort('order');
     res.json(experience);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching experience data' });
@@ -198,9 +234,27 @@ router.delete('/experience/:id', auth, async (req, res) => {
 });
 
 // Skills Routes
+// Skills order update endpoint
+router.put('/skills/reorder', auth, async (req, res) => {
+  try {
+    const { items } = req.body;
+    const bulkOps = items.map((item, index) => ({
+      updateOne: {
+        filter: { _id: item._id },
+        update: { $set: { order: index } }
+      }
+    }));
+    await Skills.bulkWrite(bulkOps);
+    res.json({ message: 'Skills order updated successfully' });
+  } catch (err) {
+    console.error('Error updating skills order:', err);
+    res.status(500).json({ message: 'Error updating skills order' });
+  }
+});
+
 router.get('/skills', async (req, res) => {
   try {
-    const skills = await Skills.find().sort('category');
+    const skills = await Skills.find().sort('order');
     res.json(skills);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching skills data' });

@@ -147,6 +147,13 @@ export const educationApi = new class extends ContentApi {
       method: 'DELETE',
     });
   }
+
+  async reorder(items: any[]) {
+    return this.fetchApi('/education/reorder', {
+      method: 'PUT',
+      body: JSON.stringify({ items }),
+    });
+  }
 };
 
 export const experienceApi = new class extends ContentApi {
@@ -173,6 +180,13 @@ export const experienceApi = new class extends ContentApi {
       method: 'DELETE',
     });
   }
+
+  async reorder(items: any[]) {
+    return this.fetchApi('/experience/reorder', {
+      method: 'PUT',
+      body: JSON.stringify({ items }),
+    });
+  }
 };
 
 export const skillsApi = new class extends ContentApi {
@@ -197,6 +211,13 @@ export const skillsApi = new class extends ContentApi {
   async delete(id: string) {
     return this.fetchApi(`/skills/${id}`, {
       method: 'DELETE',
+    });
+  }
+
+  async reorder(items: any[]) {
+    return this.fetchApi('/skills/reorder', {
+      method: 'PUT',
+      body: JSON.stringify({ items }),
     });
   }
 };

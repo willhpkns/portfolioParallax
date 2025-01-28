@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const experienceSchema = new mongoose.Schema({
+  order: {
+    type: Number,
+    required: true,
+    default: 0
+  },
   company: {
     type: String,
     required: true
@@ -10,16 +15,20 @@ const experienceSchema = new mongoose.Schema({
     required: true
   },
   startDate: {
-    type: Date,
+    type: String,
     required: true
   },
   endDate: {
-    type: Date,
+    type: String,
     required: false
   },
   description: {
     type: String,
-    required: true
+    required: false
+  },
+  technologies: {
+    type: [String],
+    default: []
   }
 }, {
   timestamps: true

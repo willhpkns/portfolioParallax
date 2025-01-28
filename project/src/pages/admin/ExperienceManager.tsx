@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { experienceApi } from '../../services/api';
 import toast from 'react-hot-toast';
-import { Plus, Edit2, Trash2 } from 'lucide-react';
+import { Plus, Edit2, Trash2, GripVertical } from 'lucide-react';
+import { DraggableItems } from '../../components/admin/DraggableItems';
 
 interface Experience {
   _id: string;
@@ -11,7 +12,8 @@ interface Experience {
   startDate: string;
   endDate: string;
   description: string;
-  highlights?: string[];
+  technologies: string[];
+  order: number;
 }
 
 interface ExperienceFormData {
@@ -19,12 +21,13 @@ interface ExperienceFormData {
   company: string;
   position: string;
   startDate: string;
-  endDate?: string;
+  endDate: string;
   description: string;
+  technologies: string[];
 }
 
 export default function ExperienceManager() {
-  const [experiences, setExperiences] = useState<Experience[]>([]);
+  const [experience, setExperience] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [currentExperience, setCurrentExperience] = useState<ExperienceFormData>({
@@ -32,17 +35,18 @@ export default function ExperienceManager() {
     position: '',
     startDate: '',
     endDate: '',
-    description: ''
+    description: '',
+    technologies: []
   });
 
   useEffect(() => {
-    loadExperiences();
+    loadExperience();
   }, []);
 
-  const loadExperiences = async () => {
+  const loadExperience = async () => {
     try {
       const data = await experienceApi.getAll();
-      setExperiences(data);
+      setExperience(data);
     } catch (error) {
       toast.error('Failed to load experience data');
     } finally {
@@ -61,7 +65,7 @@ export default function ExperienceManager() {
         toast.success('Experience added successfully');
       }
       resetForm();
-      loadExperiences();
+      loadExperience();
     } catch (error) {
       toast.error('Failed to save experience');
     }
@@ -77,10 +81,19 @@ export default function ExperienceManager() {
       try {
         await experienceApi.delete(id);
         toast.success('Experience deleted successfully');
-        loadExperiences();
+        loadExperience();
       } catch (error) {
         toast.error('Failed to delete experience');
       }
+    }
+  };
+
+  const handleOrderChange = async (newOrder: Experience[]) => {
+    try {
+      await experienceApi.reorder(newOrder);
+      setExperience(newOrder);
+    } catch (error) {
+      toast.error('Failed to update order');
     }
   };
 
@@ -91,9 +104,62 @@ export default function ExperienceManager() {
       position: '',
       startDate: '',
       endDate: '',
-      description: ''
+      description: '',
+      technologies: []
     });
   };
+
+  const handleTechnologiesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const techs = e.target.value.split(',').map(t => t.trim()).filter(Boolean);
+    setCurrentExperience({ ...currentExperience, technologies: techs });
+  };
+
+  const renderExperienceItem = (exp: Experience) => (
+    <div className="bg-white p-6 rounded-lg shadow-md group">
+      <div className="flex justify-between items-start">
+        <div>
+          <div className="flex items-center gap-2">
+            <GripVertical className="text-gray-400 opacity-0 group-hover:opacity-100 cursor-grab" size={20} />
+            <div>
+              <h3 className="text-xl font-semibold text-[#2C1810]">{exp.company}</h3>
+              <p className="text-gray-600">{exp.position}</p>
+              <p className="text-gray-500">
+                {new Date(exp.startDate).toLocaleDateString()} - 
+                {exp.endDate ? new Date(exp.endDate).toLocaleDateString() : 'Present'}
+              </p>
+              <p className="mt-2 text-gray-700">{exp.description}</p>
+              {exp.technologies.length > 0 && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {exp.technologies.map((tech, index) => (
+                    <span
+                      key={index}
+                      className="px-2 py-1 bg-gray-100 text-sm text-gray-700 rounded-md"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleEdit(exp)}
+            className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
+          >
+            <Edit2 size={20} />
+          </button>
+          <button
+            onClick={() => handleDelete(exp._id)}
+            className="p-2 text-red-600 hover:bg-red-50 rounded-full"
+          >
+            <Trash2 size={20} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <AdminLayout>
@@ -143,11 +209,21 @@ export default function ExperienceManager() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">End Date (leave empty for current job)</label>
+              <label className="block text-sm font-medium text-gray-700">End Date</label>
               <input
                 type="date"
-                value={currentExperience.endDate || ''}
-                onChange={(e) => setCurrentExperience({...currentExperience, endDate: e.target.value || undefined})}
+                value={currentExperience.endDate}
+                onChange={(e) => setCurrentExperience({...currentExperience, endDate: e.target.value})}
+                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#5C4B37] focus:ring-[#5C4B37]"
+              />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700">Technologies</label>
+              <input
+                type="text"
+                value={currentExperience.technologies.join(', ')}
+                onChange={handleTechnologiesChange}
+                placeholder="Comma-separated list of technologies"
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#5C4B37] focus:ring-[#5C4B37]"
               />
             </div>
@@ -159,6 +235,7 @@ export default function ExperienceManager() {
               onChange={(e) => setCurrentExperience({...currentExperience, description: e.target.value})}
               rows={3}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#5C4B37] focus:ring-[#5C4B37]"
+              required
             />
           </div>
           <div className="flex justify-end gap-4">
@@ -182,37 +259,11 @@ export default function ExperienceManager() {
         {loading ? (
           <div className="text-center">Loading...</div>
         ) : (
-          <div className="grid gap-4">
-            {experiences.map((exp) => (
-              <div key={exp._id} className="bg-white p-6 rounded-lg shadow-md">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="text-xl font-semibold text-[#2C1810]">{exp.position}</h3>
-                    <p className="text-gray-600">{exp.company}</p>
-                    <p className="text-gray-500">
-                      {new Date(exp.startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })} - 
-                      {exp.endDate ? new Date(exp.endDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'Present'}
-                    </p>
-                    <p className="mt-2 text-gray-700">{exp.description}</p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleEdit(exp)}
-                      className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
-                    >
-                      <Edit2 size={20} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(exp._id)}
-                      className="p-2 text-red-600 hover:bg-red-50 rounded-full"
-                    >
-                      <Trash2 size={20} />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          <DraggableItems
+            items={experience}
+            onOrderChange={handleOrderChange}
+            renderItem={renderExperienceItem}
+          />
         )}
       </div>
     </AdminLayout>

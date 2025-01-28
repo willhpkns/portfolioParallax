@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const educationSchema = new mongoose.Schema({
+  order: {
+    type: Number,
+    required: true,
+    default: 0
+  },
   institution: {
     type: String,
     required: true
