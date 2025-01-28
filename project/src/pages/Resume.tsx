@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
 import ScrollReveal from '../components/ScrollReveal';
-import { educationApi, skillsApi } from '../services/api';
+import { educationApi, skillsApi, experienceApi } from '../services/api';
+
+interface Experience {
+  _id: string;
+  company: string;
+  position: string;
+  startDate: string;
+  endDate?: string;
+  description: string;
+}
 
 interface Education {
   _id: string;
@@ -22,16 +31,19 @@ interface Skill {
 const Resume = () => {
   const [education, setEducation] = useState<Education[]>([]);
   const [skills, setSkills] = useState<Skill[]>([]);
+  const [experiences, setExperiences] = useState<Experience[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [educationData, skillsData] = await Promise.all([
+        const [educationData, skillsData, experienceData] = await Promise.all([
           educationApi.getAll(),
-          skillsApi.getAll()
+          skillsApi.getAll(),
+          experienceApi.getAll()
         ]);
         setEducation(educationData);
         setSkills(skillsData);
+        setExperiences(experienceData);
       } catch (error) {
         console.error('Error fetching resume data:', error);
       }
@@ -81,24 +93,17 @@ const Resume = () => {
               <div>
                 <h3 className="text-2xl font-semibold text-[#2C1810] mb-6">Experience</h3>
                 <div className="space-y-4">
-                  <div className="bg-[#E6D5AC]/20 p-6 rounded-lg">
-                    <h4 className="text-xl font-medium text-[#5C4B37]">Tech Company</h4>
-                    <p className="text-[#8B7355] mt-1">Software Engineer • 2023 - Present</p>
-                    <ul className="list-disc list-inside text-[#5C4B37] mt-3 space-y-1">
-                      <li>Developed and maintained full-stack web applications</li>
-                      <li>Implemented CI/CD pipelines reducing deployment time by 50%</li>
-                      <li>Collaborated with cross-functional teams to deliver features</li>
-                    </ul>
-                  </div>
-                  <div className="bg-[#E6D5AC]/20 p-6 rounded-lg">
-                    <h4 className="text-xl font-medium text-[#5C4B37]">Startup Inc</h4>
-                    <p className="text-[#8B7355] mt-1">Software Developer Intern • 2022</p>
-                    <ul className="list-disc list-inside text-[#5C4B37] mt-3 space-y-1">
-                      <li>Built responsive web interfaces using React and TypeScript</li>
-                      <li>Optimized database queries improving performance by 30%</li>
-                      <li>Participated in code reviews and agile development processes</li>
-                    </ul>
-                  </div>
+                  {experiences.map((exp) => (
+                    <div key={exp._id} className="bg-[#E6D5AC]/20 p-6 rounded-lg">
+                      <h4 className="text-xl font-medium text-[#5C4B37]">{exp.company}</h4>
+                      <p className="text-[#8B7355] mt-1">
+                        {exp.position} • {new Date(exp.startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })} - {exp.endDate ? new Date(exp.endDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'Present'}
+                      </p>
+                      <p className="text-[#5C4B37] mt-3 whitespace-pre-line">
+                        {exp.description}
+                      </p>
+                    </div>
+                  ))}
                 </div>
               </div>
 

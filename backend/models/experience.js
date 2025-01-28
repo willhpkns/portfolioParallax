@@ -9,14 +9,17 @@ const experienceSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  period: {
-    type: String,
+  startDate: {
+    type: Date,
     required: true
   },
-  highlights: {
-    type: [String],
-    required: true,
-    default: []
+  endDate: {
+    type: Date,
+    required: false
+  },
+  description: {
+    type: String,
+    required: true
   }
 }, {
   timestamps: true

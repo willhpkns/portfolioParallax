@@ -11,6 +11,7 @@ interface Experience {
   startDate: string;
   endDate: string;
   description: string;
+  highlights?: string[];
 }
 
 interface ExperienceFormData {
@@ -18,7 +19,7 @@ interface ExperienceFormData {
   company: string;
   position: string;
   startDate: string;
-  endDate: string;
+  endDate?: string;
   description: string;
 }
 
@@ -142,11 +143,11 @@ export default function ExperienceManager() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">End Date</label>
+              <label className="block text-sm font-medium text-gray-700">End Date (leave empty for current job)</label>
               <input
                 type="date"
-                value={currentExperience.endDate}
-                onChange={(e) => setCurrentExperience({...currentExperience, endDate: e.target.value})}
+                value={currentExperience.endDate || ''}
+                onChange={(e) => setCurrentExperience({...currentExperience, endDate: e.target.value || undefined})}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#5C4B37] focus:ring-[#5C4B37]"
               />
             </div>
@@ -189,8 +190,8 @@ export default function ExperienceManager() {
                     <h3 className="text-xl font-semibold text-[#2C1810]">{exp.position}</h3>
                     <p className="text-gray-600">{exp.company}</p>
                     <p className="text-gray-500">
-                      {new Date(exp.startDate).toLocaleDateString()} - 
-                      {exp.endDate ? new Date(exp.endDate).toLocaleDateString() : 'Present'}
+                      {new Date(exp.startDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' })} - 
+                      {exp.endDate ? new Date(exp.endDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long' }) : 'Present'}
                     </p>
                     <p className="mt-2 text-gray-700">{exp.description}</p>
                   </div>

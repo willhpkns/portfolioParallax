@@ -14,9 +14,15 @@ export default function AdminLogin() {
     e.preventDefault();
     try {
       const response = await authApi.login({ username, password });
-      login(response.token);
-      toast.success('Successfully logged in');
-      navigate('/admin/dashboard');
+      await new Promise<void>((resolve) => {
+        login(response.token);
+        // Wait for next tick to ensure auth state is updated
+        setTimeout(() => {
+          toast.success('Successfully logged in');
+          navigate('/admin/dashboard');
+          resolve();
+        }, 0);
+      });
     } catch (error) {
       toast.error('Invalid credentials');
       console.error('Login error:', error);
