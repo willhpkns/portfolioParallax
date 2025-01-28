@@ -14,21 +14,25 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { SortableItem } from './SortableItem';
+import { SortableSection } from './SortableSection';
 
-interface Props<T extends { _id: string }> {
+interface Props<T> {
   items: T[];
   onOrderChange: (newOrder: T[]) => void;
   renderItem: (item: T) => React.ReactNode;
 }
 
-export function DraggableItems<T extends { _id: string }>({ 
+export function DraggableList<T extends { _id: string }>({ 
   items, 
-  onOrderChange,
+  onOrderChange, 
   renderItem 
 }: Props<T>) {
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // Add a small threshold before dragging starts
+      }
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -41,10 +45,8 @@ export function DraggableItems<T extends { _id: string }>({
       const oldIndex = items.findIndex(item => item._id === active.id);
       const newIndex = items.findIndex(item => item._id === over.id);
       
-      if (oldIndex !== -1 && newIndex !== -1) {
-        const newItems = arrayMove(items, oldIndex, newIndex);
-        onOrderChange(newItems);
-      }
+      const newOrder = arrayMove(items, oldIndex, newIndex);
+      onOrderChange(newOrder);
     }
   }
 
@@ -60,9 +62,9 @@ export function DraggableItems<T extends { _id: string }>({
       >
         <div className="space-y-4">
           {items.map((item) => (
-            <SortableItem key={item._id} id={item._id}>
+            <SortableSection key={item._id} id={item._id}>
               {renderItem(item)}
-            </SortableItem>
+            </SortableSection>
           ))}
         </div>
       </SortableContext>

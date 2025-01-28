@@ -14,7 +14,6 @@ interface Education {
   startDate: string;
   endDate: string;
   description: string;
-  order: number;
 }
 
 interface EducationFormData {
@@ -91,8 +90,13 @@ export default function EducationManager() {
 
   const handleOrderChange = async (newOrder: Education[]) => {
     try {
-      await educationApi.reorder(newOrder);
-      setEducation(newOrder);
+      // Update the array order property for each item
+      const updatedOrder = newOrder.map((item, index) => ({
+        ...item,
+        order: index
+      }));
+      await educationApi.reorder(updatedOrder);
+      setEducation(updatedOrder);
       toast.success('Order saved');
     } catch (error) {
       toast.error('Failed to update order');

@@ -14,7 +14,6 @@ interface Experience {
   endDate: string;
   description: string;
   technologies: string[];
-  order: number;
 }
 
 interface ExperienceFormData {
@@ -91,8 +90,13 @@ export default function ExperienceManager() {
 
   const handleOrderChange = async (newOrder: Experience[]) => {
     try {
-      await experienceApi.reorder(newOrder);
-      setExperience(newOrder);
+      // Update the array order property for each item
+      const updatedOrder = newOrder.map((item, index) => ({
+        ...item,
+        order: index
+      }));
+      await experienceApi.reorder(updatedOrder);
+      setExperience(updatedOrder);
       toast.success('Order saved');
     } catch (error) {
       toast.error('Failed to update order');

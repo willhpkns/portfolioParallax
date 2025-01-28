@@ -10,7 +10,6 @@ interface Skill {
   _id: string;
   category: string;
   items: string[];
-  order: number;
 }
 
 interface SkillFormData {
@@ -79,8 +78,13 @@ export default function SkillsManager() {
 
   const handleOrderChange = async (newOrder: Skill[]) => {
     try {
-      await skillsApi.reorder(newOrder);
-      setSkills(newOrder);
+      // Update the array order property for each item
+      const updatedOrder = newOrder.map((item, index) => ({
+        ...item,
+        order: index
+      }));
+      await skillsApi.reorder(updatedOrder);
+      setSkills(updatedOrder);
       toast.success('Order saved');
     } catch (error) {
       toast.error('Failed to update order');

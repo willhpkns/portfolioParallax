@@ -154,6 +154,17 @@ export const educationApi = new class extends ContentApi {
       body: JSON.stringify({ items }),
     });
   }
+
+  async updateOrder(items: any[]) {
+    const response = await fetch(`${API_BASE_URL}/education/order`, {
+      method: 'PUT',
+      body: JSON.stringify(items),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.json();
+  }
 };
 
 export const experienceApi = new class extends ContentApi {
@@ -187,6 +198,17 @@ export const experienceApi = new class extends ContentApi {
       body: JSON.stringify({ items }),
     });
   }
+
+  async updateOrder(items: any[]) {
+    const response = await fetch(`${API_BASE_URL}/experience/order`, {
+      method: 'PUT',
+      body: JSON.stringify(items),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.json();
+  }
 };
 
 export const skillsApi = new class extends ContentApi {
@@ -219,6 +241,17 @@ export const skillsApi = new class extends ContentApi {
       method: 'PUT',
       body: JSON.stringify({ items }),
     });
+  }
+
+  async updateOrder(items: any[]) {
+    const response = await fetch(`${API_BASE_URL}/skills/order`, {
+      method: 'PUT',
+      body: JSON.stringify(items),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    return response.json();
   }
 };
 
