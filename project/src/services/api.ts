@@ -67,10 +67,11 @@ class ContentApi {
     });
 
     if (!response.ok) {
+      const errorData = await response.json();
       if (response.status === 401) {
-        throw new Error('No authentication token, access denied');
+        throw new Error(errorData.message || 'No authentication token, access denied');
       }
-      throw new Error('API request failed');
+      throw new Error(errorData.error || errorData.message || 'API request failed');
     }
 
     return response.json();

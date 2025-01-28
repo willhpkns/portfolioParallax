@@ -21,8 +21,24 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/portfolio
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-.then(() => console.log('Connected to MongoDB'))
-.catch(err => console.error('MongoDB connection error:', err));
+.then(() => {
+  console.log('Connected to MongoDB');
+  console.log('MongoDB URI:', process.env.MONGODB_URI || 'mongodb://localhost:27017/portfolio');
+  // Check database connection state
+  const dbState = mongoose.connection.readyState;
+  console.log('Database connection state:', dbState, '(0: disconnected, 1: connected, 2: connecting, 3: disconnecting)');
+})
+.catch(err => {
+  console.error('MongoDB connection error:', err);
+  // Log more details about the error
+  if (err.name === 'MongoServerError') {
+    console.error('MongoDB Server Error Details:', {
+      code: err.code,
+      codeName: err.codeName,
+      errorLabels: err.errorLabels,
+    });
+  }
+});
 
 // Mount routes
 app.use('/api/auth', authRoutes);

@@ -12,7 +12,7 @@ interface ProjectCardProps {
 export default function ProjectCard({ title, description, image, technologies, index }: ProjectCardProps) {
   return (
     <ScrollReveal className={`transition-all duration-500 delay-${index * 100}`}>
-      <div className="bg-[#YOUR_COLOR_HERE] rounded-lg overflow-hidden hover:transform hover:scale-105 transition-transform duration-300 shadow-xl">
+      <div className="bg-white rounded-lg overflow-hidden hover:transform hover:scale-105 transition-transform duration-300 shadow-xl">
         <img
           src={image}
           alt={title}

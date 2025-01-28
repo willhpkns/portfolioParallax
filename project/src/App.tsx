@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { Toaster } from 'react-hot-toast';
-import { aboutApi } from './services/api';
+import { aboutApi, projectApi } from './services/api';
 import ParallaxBackground from './components/ParallaxBackground';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminLogin from './pages/admin/AdminLogin';
@@ -19,26 +19,13 @@ import ProjectCard from './components/ProjectCard';
 import ContactForm from './components/ContactForm';
 import { ChevronDown, Terminal, ChevronUp } from 'lucide-react';
 
-const projects = [
-  {
-    title: 'Test1',
-    description: 'A modern e-commerce platform built with React and Node.js, featuring real-time updates and cart management.',
-    image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=800',
-    technologies: ['React', 'Node.js', 'MongoDB'],
-  },
-  {
-    title: 'Test2',
-    description: 'Real-time chat application powered by AI for smart responses and language translation.',
-    image: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=800',
-    technologies: ['Python', 'TensorFlow', 'WebSocket'],
-  },
-  {
-    title: 'Test3',
-    description: 'Analytics dashboard for cloud infrastructure monitoring with real-time metrics.',
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800',
-    technologies: ['Vue.js', 'D3.js', 'AWS'],
-  },
-];
+interface Project {
+  _id: string;
+  title: string;
+  description: string;
+  image: string;
+  technologies: string[];
+}
 
 const ScrollToTop = () => {
   const [isVisible, setIsVisible] = useState(false);
@@ -85,6 +72,10 @@ function Home() {
     profileImage: ""
   });
 
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [projectsLoading, setProjectsLoading] = useState(true);
+  const [projectsError, setProjectsError] = useState<string | null>(null);
+
   useEffect(() => {
     const fetchAboutData = async () => {
       try {
@@ -100,7 +91,20 @@ function Home() {
       }
     };
 
+    const fetchProjects = async () => {
+      try {
+        const data = await projectApi.getAll();
+        setProjects(data);
+      } catch (error) {
+        console.error('Error loading projects:', error);
+        setProjectsError('Failed to load projects');
+      } finally {
+        setProjectsLoading(false);
+      }
+    };
+
     fetchAboutData();
+    fetchProjects();
   }, []);
 
   return (
@@ -157,11 +161,41 @@ function Home() {
           <ScrollReveal>
             <h2 className="text-4xl font-bold mb-12">Featured Projects</h2>
           </ScrollReveal>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {projects.map((project, index) => (
-              <ProjectCard key={index} {...project} index={index} />
-            ))}
-          </div>
+          {projectsLoading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-gray-200 rounded-lg h-48"></div>
+                  <div className="mt-4 space-y-3">
+                    <div className="h-6 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded"></div>
+                    <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : projectsError ? (
+            <div className="text-center text-red-600 py-8">
+              <p>{projectsError}</p>
+            </div>
+          ) : projects.length === 0 ? (
+            <div className="text-center text-gray-600 py-8">
+              <p>No projects available at the moment.</p>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {projects.map((project, index) => (
+                <ProjectCard
+                  key={project._id}
+                  title={project.title}
+                  description={project.description}
+                  image={project.image}
+                  technologies={project.technologies}
+                  index={index}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
 

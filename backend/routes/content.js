@@ -47,26 +47,43 @@ router.get('/projects', async (req, res) => {
 
 router.post('/projects', auth, async (req, res) => {
   try {
-    const project = await Project.create(req.body);
+    console.log('Creating project with data:', req.body);
+    // Ensure technologies is an array
+    const projectData = {
+      ...req.body,
+      technologies: Array.isArray(req.body.technologies) ? req.body.technologies : []
+    };
+    console.log('Processed project data:', projectData);
+    const project = await Project.create(projectData);
     res.status(201).json(project);
   } catch (err) {
-    res.status(500).json({ message: 'Error creating project' });
+    res.status(500).json({ message: 'Error creating project', error: err.message });
   }
 });
 
 router.put('/projects/:id', auth, async (req, res) => {
   try {
-    const project = await Project.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
+    console.log('Updating project with data:', req.body);
+    
+    const project = await Project.findById(req.params.id);
     if (!project) {
       return res.status(404).json({ message: 'Project not found' });
     }
+
+    // Update each field individually
+    project.title = req.body.title;
+    project.description = req.body.description;
+    project.image = req.body.image;
+    project.technologies = Array.isArray(req.body.technologies) ? req.body.technologies : [];
+    
+    console.log('Saving project with technologies:', project.technologies);
+    await project.save();
+    
+    console.log('Updated project:', project);
     res.json(project);
   } catch (err) {
-    res.status(500).json({ message: 'Error updating project' });
+    console.error('Error updating project:', err);
+    res.status(500).json({ message: 'Error updating project', error: err.message });
   }
 });
 

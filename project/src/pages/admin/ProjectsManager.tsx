@@ -3,6 +3,7 @@ import AdminLayout from '../../components/admin/AdminLayout';
 import { projectApi } from '../../services/api';
 import toast from 'react-hot-toast';
 import { Plus, Edit2, Trash2, X } from 'lucide-react';
+import axios, { AxiosError } from 'axios';
 
 interface Project {
   _id: string;
@@ -10,6 +11,9 @@ interface Project {
   description: string;
   image: string;
   technologies: string[];
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 }
 
 export default function ProjectsManager() {
@@ -40,29 +44,77 @@ export default function ProjectsManager() {
     }
   };
 
-  const handleCreateProject = async () => {
+  const handleCreateProject = async (projectData: Partial<Project>) => {
+    console.log('Initial project data:', projectData);
+    
+    // Validate required fields
+    if (!projectData.title?.trim()) {
+      toast.error('Title is required');
+      return;
+    }
+    if (!projectData.description?.trim()) {
+      toast.error('Description is required');
+      return;
+    }
+    if (!projectData.image?.trim()) {
+      toast.error('Image URL is required');
+      return;
+    }
+
+    // Ensure technologies is initialized and is an array
+    const dataToSend = {
+      ...projectData,
+      technologies: Array.isArray(projectData.technologies) ? projectData.technologies : []
+    };
+
+    console.log('Sending project data:', dataToSend);
+
     try {
-      await projectApi.create(newProject);
+      const response = await projectApi.create(dataToSend);
+      console.log('Created project:', response);
       toast.success('Project created successfully');
       setIsModalOpen(false);
       setNewProject({ title: '', description: '', image: '', technologies: [] });
       loadProjects();
     } catch (error) {
-      console.error('Error creating project:', error);
-      toast.error('Failed to create project');
+      const axiosError = error as AxiosError;
+      const errorMessage = (axiosError.response?.data as any)?.error || axiosError.message || 'Failed to create project';
+      console.error('Error creating project:', axiosError);
+      toast.error(errorMessage);
     }
   };
 
-  const handleUpdateProject = async (id: string) => {
-    if (!editingProject) return;
+  const handleUpdateProject = async (id: string, projectData: Partial<Project>) => {
+    // Validate required fields
+    if (!projectData.title?.trim()) {
+      toast.error('Title is required');
+      return;
+    }
+    if (!projectData.description?.trim()) {
+      toast.error('Description is required');
+      return;
+    }
+    if (!projectData.image?.trim()) {
+      toast.error('Image URL is required');
+      return;
+    }
+
+    // Ensure technologies is initialized
+    const dataToSend = {
+      ...projectData,
+      technologies: projectData.technologies || []
+    };
+
     try {
-      await projectApi.update(id, editingProject);
+      await projectApi.update(id, dataToSend);
       toast.success('Project updated successfully');
       setEditingProject(null);
       loadProjects();
     } catch (error) {
-      console.error('Error updating project:', error);
-      toast.error('Failed to update project');
+      const axiosError = error as AxiosError;
+      const errorMessage = (axiosError.response?.data as any)?.error || axiosError.message || 'Failed to update project';
+      console.error('Error updating project:', axiosError);
+      toast.error(errorMessage);
     }
   };
 
@@ -85,24 +137,58 @@ export default function ProjectsManager() {
   }
 
   const ProjectModal = ({ project, onSave, onClose }: ProjectModalProps) => {
-    const [formData, setFormData] = useState(project);
+    // Initialize form data
+    const [formData, setFormData] = useState<Partial<Project>>(() => {
+      const initialTechnologies = Array.isArray(project.technologies) ? [...project.technologies] : [];
+      console.log('Initializing form with technologies:', initialTechnologies);
+      return {
+        title: project.title || '',
+        description: project.description || '',
+        image: project.image || '',
+        technologies: initialTechnologies,
+        _id: project._id,
+        createdAt: project.createdAt,
+        updatedAt: project.updatedAt,
+        __v: project.__v
+      };
+    });
+
+    // Update form data when project changes
+    useEffect(() => {
+      console.log('Project changed:', project);
+      const updatedTechnologies = Array.isArray(project.technologies) ? [...project.technologies] : [];
+      console.log('Updating form with technologies:', updatedTechnologies);
+      setFormData(prevData => ({
+        ...prevData,
+        title: project.title || prevData.title || '',
+        description: project.description || prevData.description || '',
+        image: project.image || prevData.image || '',
+        technologies: updatedTechnologies
+      }));
+    }, [project]);
     const [techInput, setTechInput] = useState('');
 
     const handleTechKeyDown = (e: React.KeyboardEvent) => {
       if (e.key === 'Enter' && techInput.trim()) {
         e.preventDefault();
-        setFormData({
-          ...formData,
-          technologies: [...(formData.technologies || []), techInput.trim()],
-        });
+        const newTech = techInput.trim();
+        // Prevent duplicates
+        const currentTechnologies = formData.technologies || [];
+        if (!currentTechnologies.includes(newTech)) {
+          setFormData({
+            ...formData,
+            technologies: [...currentTechnologies, newTech],
+          });
+        }
         setTechInput('');
       }
     };
 
-      const removeTech = (index: number) => {
+    const removeTech = (index: number) => {
+      const currentTechnologies = formData.technologies || [];
       setFormData({
         ...formData,
-        technologies: formData.technologies?.filter((_: string, i: number) => i !== index),
+        technologies: currentTechnologies.filter((_, i) => i !== index)
       });
     };
 
@@ -155,34 +241,97 @@ export default function ProjectsManager() {
               />
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
                 Technologies
               </label>
-              <input
-                type="text"
-                value={techInput}
-                onChange={(e) => setTechInput(e.target.value)}
-                onKeyDown={handleTechKeyDown}
-                placeholder="Press Enter to add"
-                className="w-full p-2 border rounded focus:ring-2 focus:ring-[#5C4B37]"
-              />
-              <div className="flex flex-wrap gap-2 mt-2">
+              <div className="flex items-center gap-2">
+                <input
+                  type="text"
+                  value={techInput}
+                  onChange={(e) => setTechInput(e.target.value.slice(0, 30))}
+                  onKeyDown={handleTechKeyDown}
+                  placeholder="e.g. React, Node.js, TypeScript"
+                  className="flex-1 p-2 border rounded focus:ring-2 focus:ring-[#5C4B37]"
+                />
+                <button
+                  onClick={() => {
+                    if (techInput.trim()) {
+                      const newTech = techInput.trim();
+                      const currentTechnologies = formData.technologies || [];
+                      if (!currentTechnologies.includes(newTech)) {
+                        setFormData({
+                          ...formData,
+                          technologies: [...currentTechnologies, newTech],
+                        });
+                        setTechInput('');
+                        toast.success(`Added ${newTech}`);
+                      } else {
+                        toast.error('Technology already added');
+                      }
+                    }
+                  }}
+                  type="button"
+                  className="p-2 bg-[#2C1810] text-white rounded hover:bg-[#5C4B37] transition-colors"
+                >
+                  <Plus size={20} />
+                </button>
+              </div>
+              <p className="text-sm text-gray-500">
+                Type a technology and press Enter or click + to add. Click × to remove.
+              </p>
+              
+              {/* Common technologies suggestions */}
+              <div className="mt-2">
+                <p className="text-sm text-gray-600 mb-1">Common technologies:</p>
+                <div className="flex flex-wrap gap-2">
+                  {["React", "Node.js", "TypeScript", "JavaScript", "HTML", "CSS", "MongoDB", "PostgreSQL", "Python", "Docker"].map((tech) => (
+                    !formData.technologies?.includes(tech) && (
+                      <button
+                        key={tech}
+                        onClick={() => {
+                          const currentTechnologies = formData.technologies || [];
+                          setFormData({
+                            ...formData,
+                            technologies: [...currentTechnologies, tech],
+                          });
+                          toast.success(`Added ${tech}`);
+                        }}
+                        className="px-2 py-1 text-sm border border-[#2C1810] text-[#2C1810] rounded-full hover:bg-[#2C1810] hover:text-white transition-colors"
+                      >
+                        + {tech}
+                      </button>
+                    )
+                  ))}
+                </div>
+              </div>
+
+              {/* Selected technologies */}
+              <div className="flex flex-wrap gap-2 mt-3">
                 {formData.technologies?.map((tech: string, index: number) => (
                   <span
                     key={index}
-                    className="bg-[#2C1810] text-white px-2 py-1 rounded-full text-sm flex items-center gap-1"
+                    className="bg-[#2C1810] text-white px-3 py-1.5 rounded-full text-sm flex items-center gap-2 group transition-all hover:bg-opacity-90"
                   >
                     {tech}
                     <button
-                      onClick={() => removeTech(index)}
-                      className="hover:text-red-300"
+                      onClick={() => {
+                        removeTech(index);
+                        toast.success(`Removed ${tech}`);
+                      }}
+                      className="hover:bg-red-500 hover:text-white rounded-full p-1 transition-colors"
                     >
                       <X size={14} />
                     </button>
                   </span>
                 ))}
               </div>
+              
+              {formData.technologies?.length === 0 && (
+                <p className="text-sm text-gray-500 italic mt-2">
+                  No technologies added yet
+                </p>
+              )}
             </div>
 
             <div className="flex justify-end gap-2 mt-6">
@@ -192,12 +341,19 @@ export default function ProjectsManager() {
               >
                 Cancel
               </button>
-              <button
-                onClick={() => onSave(formData)}
-                className="px-4 py-2 bg-[#2C1810] text-white rounded hover:bg-[#5C4B37]"
-              >
-                Save Project
-              </button>
+          <button
+            onClick={() => {
+              const dataToSave = {
+                ...formData,
+                technologies: formData.technologies || []
+              };
+              console.log('Saving project with data:', dataToSave);
+              onSave(dataToSave);
+            }}
+            className="px-4 py-2 bg-[#2C1810] text-white rounded hover:bg-[#5C4B37]"
+          >
+            Save Project
+          </button>
             </div>
           </div>
         </div>
@@ -282,10 +438,21 @@ export default function ProjectsManager() {
           <ProjectModal
             project={editingProject || newProject}
             onSave={(formData: Partial<Project>) => {
+              console.log('Modal save - form data:', formData);
+              console.log('Current technologies:', formData.technologies);
+
+              // Always use the form's technologies array
+              const dataToSend = {
+                ...formData,
+                technologies: formData.technologies || []
+              };
+              
+              console.log('Sending to API:', dataToSend);
+              console.log('Technologies being sent:', dataToSend.technologies);
               if (editingProject) {
-                handleUpdateProject(editingProject._id);
+                handleUpdateProject(editingProject._id, dataToSend);
               } else {
-                handleCreateProject();
+                handleCreateProject(dataToSend);
               }
             }}
             onClose={() => {

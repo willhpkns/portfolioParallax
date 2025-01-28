@@ -9,14 +9,8 @@ const auth = (req, res, next) => {
       return res.status(401).json({ message: 'No authentication token, access denied' });
     }
 
-    // Verify token
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
-    if (!verified) {
-      return res.status(401).json({ message: 'Token verification failed, access denied' });
-    }
-
-    // Add user info to request
-    req.user = verified;
+    // Verify token and add user info to request
+    req.user = jwt.verify(token, process.env.JWT_SECRET);
     next();
   } catch (err) {
     res.status(401).json({ message: 'Token is not valid' });
