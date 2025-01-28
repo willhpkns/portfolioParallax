@@ -77,7 +77,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 overflow-auto">
+      <main className="flex-1 p-8 overflow-auto relative z-10">
         <div className="max-w-7xl mx-auto">
           {children}
         </div>
