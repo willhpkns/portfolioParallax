@@ -200,3 +200,19 @@ export const skillsApi = new class extends ContentApi {
     });
   }
 };
+
+export type ResumeSectionType = 'education' | 'experience' | 'skills';
+
+export const settingsApi = new class extends ContentApi {
+  async getResumeOrder(): Promise<ResumeSectionType[]> {
+    const response = await this.fetchApi('/settings/resume-order');
+    return response.order;
+  }
+
+  async updateResumeOrder(order: ResumeSectionType[]) {
+    return this.fetchApi('/settings/resume-order', {
+      method: 'POST',
+      body: JSON.stringify({ order }),
+    });
+  }
+};

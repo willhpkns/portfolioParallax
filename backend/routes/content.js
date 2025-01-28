@@ -6,6 +6,10 @@ const Project = require('../models/project');
 const Education = require('../models/education');
 const Experience = require('../models/experience');
 const Skills = require('../models/skills');
+const Settings = require('../models/settings');
+
+// Default section order if none is saved
+const DEFAULT_SECTION_ORDER = ['education', 'experience', 'skills'];
 
 // About Routes
 router.get('/about', async (req, res) => {
@@ -237,6 +241,56 @@ router.delete('/skills/:id', auth, async (req, res) => {
     res.json({ message: 'Skills entry deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: 'Error deleting skills entry' });
+  }
+});
+
+// Get resume section order
+router.get('/settings/resume-order', async (req, res) => {
+  try {
+    const setting = await Settings.findOne({ key: 'resumeSectionOrder' });
+    res.json({ order: setting?.value || DEFAULT_SECTION_ORDER });
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching resume section order' });
+  }
+});
+
+// Update resume section order
+router.post('/settings/resume-order', auth, async (req, res) => {
+  try {
+    console.log('Received resume order update request:', req.body);
+    const { order } = req.body;
+    
+    if (!Array.isArray(order)) {
+      console.error('Order is not an array:', order);
+      return res.status(400).json({ message: 'Order must be an array' });
+    }
+
+    if (order.length !== 3) {
+      console.error('Invalid order length:', order.length);
+      return res.status(400).json({ message: 'Order must contain exactly 3 sections' });
+    }
+
+    const requiredSections = ['education', 'experience', 'skills'];
+    const missingSection = requiredSections.find(section => !order.includes(section));
+    if (missingSection) {
+      console.error('Missing required section:', missingSection);
+      return res.status(400).json({ message: `Missing required section: ${missingSection}` });
+    }
+
+    const result = await Settings.findOneAndUpdate(
+      { key: 'resumeSectionOrder' },
+      { key: 'resumeSectionOrder', value: order },
+      { upsert: true, new: true }
+    );
+
+    console.log('Updated resume section order:', result);
+    res.json({ message: 'Resume section order updated', order });
+  } catch (err) {
+    console.error('Error updating resume section order:', err);
+    res.status(500).json({ 
+      message: 'Error updating resume section order',
+      error: err.message 
+    });
   }
 });
 

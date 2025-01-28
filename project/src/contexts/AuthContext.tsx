@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { aboutApi, projectApi, educationApi, experienceApi, skillsApi } from '../services/api';
+import { aboutApi, projectApi, educationApi, experienceApi, skillsApi, settingsApi } from '../services/api';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -38,6 +38,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       educationApi.setToken(token);
       experienceApi.setToken(token);
       skillsApi.setToken(token);
+      settingsApi.setToken(token);
     } else {
       localStorage.removeItem('token');
       setIsAuthenticated(false);
@@ -47,6 +48,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       educationApi.setToken(null);
       experienceApi.setToken(null);
       skillsApi.setToken(null);
+      settingsApi.setToken(null);
     }
   }, [token]);
 
