@@ -4,6 +4,7 @@ import { experienceApi } from '../../services/api';
 import toast from 'react-hot-toast';
 import { Plus, Edit2, Trash2, GripVertical } from 'lucide-react';
 import { DraggableItems } from '../../components/admin/DraggableItems';
+import { SortableItem } from '../../components/admin/SortableItem';
 
 interface Experience {
   _id: string;
@@ -92,6 +93,7 @@ export default function ExperienceManager() {
     try {
       await experienceApi.reorder(newOrder);
       setExperience(newOrder);
+      toast.success('Order saved');
     } catch (error) {
       toast.error('Failed to update order');
     }
@@ -114,12 +116,17 @@ export default function ExperienceManager() {
     setCurrentExperience({ ...currentExperience, technologies: techs });
   };
 
-  const renderExperienceItem = (exp: Experience) => (
-    <div className="bg-white p-6 rounded-lg shadow-md group">
-      <div className="flex justify-between items-start">
-        <div>
-          <div className="flex items-center gap-2">
-            <GripVertical className="text-gray-400 opacity-0 group-hover:opacity-100 cursor-grab" size={20} />
+  const renderExperienceItem = (exp: Experience) => {
+    const dragHandle = (
+      <div className="text-gray-400 opacity-50 group-hover:opacity-100 cursor-grab my-6">
+        <GripVertical size={20} />
+      </div>
+    );
+
+    return (
+      <SortableItem key={exp._id} id={exp._id} handle={dragHandle}>
+        <div className="bg-white p-6 rounded-lg shadow-md group w-full">
+          <div className="flex justify-between items-start">
             <div>
               <h3 className="text-xl font-semibold text-[#2C1810]">{exp.company}</h3>
               <p className="text-gray-600">{exp.position}</p>
@@ -141,25 +148,25 @@ export default function ExperienceManager() {
                 </div>
               )}
             </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleEdit(exp)}
+                className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
+              >
+                <Edit2 size={20} />
+              </button>
+              <button
+                onClick={() => handleDelete(exp._id)}
+                className="p-2 text-red-600 hover:bg-red-50 rounded-full"
+              >
+                <Trash2 size={20} />
+              </button>
+            </div>
           </div>
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => handleEdit(exp)}
-            className="p-2 text-blue-600 hover:bg-blue-50 rounded-full"
-          >
-            <Edit2 size={20} />
-          </button>
-          <button
-            onClick={() => handleDelete(exp._id)}
-            className="p-2 text-red-600 hover:bg-red-50 rounded-full"
-          >
-            <Trash2 size={20} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+      </SortableItem>
+    );
+  };
 
   return (
     <AdminLayout>
