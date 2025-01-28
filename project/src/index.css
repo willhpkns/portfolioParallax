@@ -2,6 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  /* Admin panel input styling */
+  .admin input[type="text"],
+  .admin input[type="password"],
+  .admin input[type="email"],
+  .admin textarea {
+    @apply caret-[#5C4B37] transition-all duration-200 px-1;
+  }
+
+  .admin input[type="text"]:focus,
+  .admin input[type="password"]:focus,
+  .admin input[type="email"]:focus,
+  .admin textarea:focus {
+    @apply bg-[#FDF8F3] outline-none ring-2 ring-[#5C4B37] border-[#5C4B37] shadow-sm;
+  }
+}
+
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
