@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const educationSchema = new mongoose.Schema({
-  school: {
+  institution: {
     type: String,
     required: true
   },
@@ -9,14 +9,21 @@ const educationSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  period: {
+  field: {
     type: String,
     required: true
   },
-  highlights: {
-    type: [String],
-    required: true,
-    default: []
+  startDate: {
+    type: String,
+    required: true
+  },
+  endDate: {
+    type: String,
+    required: false
+  },
+  description: {
+    type: String,
+    required: false
   }
 }, {
   timestamps: true
