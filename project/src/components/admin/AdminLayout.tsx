@@ -59,6 +59,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
         { path: '/admin/education', label: 'Education', icon: GraduationCap },
         { path: '/admin/experience', label: 'Experience', icon: Briefcase },
         { path: '/admin/skills', label: 'Skills', icon: Award },
+        { path: '/admin/resume-preview', label: 'Preview', icon: FileText },
       ],
     },
   ];
@@ -74,7 +75,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const isActive = (path: string) => {
     if (path === location.pathname) return true;
     if (path === 'resume') {
-      return ['/admin/education', '/admin/experience', '/admin/skills'].includes(location.pathname);
+      return ['/admin/education', '/admin/experience', '/admin/skills', '/admin/resume-preview'].includes(location.pathname);
     }
     return false;
   };

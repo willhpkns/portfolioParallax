@@ -14,6 +14,7 @@ import ExperienceManager from './pages/admin/ExperienceManager';
 import SideMenu from './components/SideMenu';
 import ScrollReveal from './components/ScrollReveal';
 import Resume from './pages/Resume';
+import ResumePreview from './pages/admin/ResumePreview';
 import { useState, useEffect } from 'react';
 import ProjectCard from './components/ProjectCard';
 import ContactForm from './components/ContactForm';
@@ -245,6 +246,7 @@ function App() {
             <Route path="/admin/education" element={<EducationManager />} />
             <Route path="/admin/skills" element={<SkillsManager />} />
             <Route path="/admin/experience" element={<ExperienceManager />} />
+            <Route path="/admin/resume-preview" element={<ResumePreview />} />
           </Route>
         </Routes>
         <ScrollToTop />
