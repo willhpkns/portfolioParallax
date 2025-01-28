@@ -7,6 +7,7 @@ import {
   useSensor,
   useSensors,
   DragEndEvent,
+  DragStartEvent,
 } from '@dnd-kit/core';
 import {
   arrayMove,
@@ -14,7 +15,6 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { SortableItem } from './SortableItem';
 
 interface Props<T extends { _id: string }> {
   items: T[];
@@ -27,14 +27,26 @@ export function DraggableItems<T extends { _id: string }>({
   onOrderChange,
   renderItem 
 }: Props<T>) {
+  const [activeId, setActiveId] = React.useState<string | null>(null);
+
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 5, // Distance in pixels before drag starts
+        delay: 50, // Small delay helps with accidental drags
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
+  function handleDragStart(event: DragStartEvent) {
+    setActiveId(event.active.id as string);
+  }
+
   function handleDragEnd(event: DragEndEvent) {
+    setActiveId(null);
     const { active, over } = event;
 
     if (over && active.id !== over.id) {
@@ -48,11 +60,17 @@ export function DraggableItems<T extends { _id: string }>({
     }
   }
 
+  function handleDragCancel() {
+    setActiveId(null);
+  }
+
   return (
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
+      onDragCancel={handleDragCancel}
     >
       <SortableContext 
         items={items.map(item => item._id)} 
@@ -60,9 +78,9 @@ export function DraggableItems<T extends { _id: string }>({
       >
         <div className="space-y-4">
           {items.map((item) => (
-            <SortableItem key={item._id} id={item._id}>
+            <React.Fragment key={item._id}>
               {renderItem(item)}
-            </SortableItem>
+            </React.Fragment>
           ))}
         </div>
       </SortableContext>
