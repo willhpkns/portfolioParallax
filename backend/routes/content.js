@@ -263,25 +263,63 @@ router.get('/skills', async (req, res) => {
 
 router.post('/skills', auth, async (req, res) => {
   try {
-    const skills = await Skills.create(req.body);
-    res.status(201).json(skills);
+    const { category, items } = req.body;
+    
+    // Find existing category (case-insensitive)
+    const existingSkills = await Skills.findOne({
+      category: { $regex: new RegExp(`^${category}$`, 'i') }
+    });
+
+    if (existingSkills) {
+      // Merge with existing category
+      existingSkills.items = [...existingSkills.items, ...items];
+      const updatedSkills = await existingSkills.save();
+      res.json(updatedSkills);
+    } else {
+      // Create new category
+      const skills = await Skills.create(req.body);
+      res.status(201).json(skills);
+    }
   } catch (err) {
-    res.status(500).json({ message: 'Error creating skills entry' });
+    console.error('Error creating/updating skills:', err);
+    res.status(500).json({ message: 'Error creating/updating skills entry' });
   }
 });
 
 router.put('/skills/:id', auth, async (req, res) => {
   try {
-    const skills = await Skills.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    if (!skills) {
-      return res.status(404).json({ message: 'Skills entry not found' });
+    const { category, items } = req.body;
+    const id = req.params.id;
+
+    // Find any existing category with same name but different ID
+    const existingSkills = await Skills.findOne({
+      _id: { $ne: id },
+      category: { $regex: new RegExp(`^${category}$`, 'i') }
+    });
+
+    if (existingSkills) {
+      // Merge items with existing category
+      existingSkills.items = [...existingSkills.items, ...items];
+      const updatedSkills = await existingSkills.save();
+      
+      // Delete the original category
+      await Skills.findByIdAndDelete(id);
+      
+      res.json(updatedSkills);
+    } else {
+      // Update normally if no duplicate category
+      const skills = await Skills.findByIdAndUpdate(
+        id,
+        req.body,
+        { new: true }
+      );
+      if (!skills) {
+        return res.status(404).json({ message: 'Skills entry not found' });
+      }
+      res.json(skills);
     }
-    res.json(skills);
   } catch (err) {
+    console.error('Error updating skills:', err);
     res.status(500).json({ message: 'Error updating skills entry' });
   }
 });

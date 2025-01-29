@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { skillsApi, type SkillItem, type Skill } from '../../services/api';
 import toast from 'react-hot-toast';
@@ -6,6 +6,7 @@ import { Plus, Edit2, Trash2, GripVertical } from 'lucide-react';
 import { DraggableItems } from '../../components/admin/DraggableItems';
 import { SortableItem } from '../../components/admin/SortableItem';
 import SkillLevelSelector from '../../components/admin/SkillLevelSelector';
+import CategoryAutocomplete from '../../components/admin/CategoryAutocomplete';
 
 interface SkillFormData {
   _id?: string;
@@ -39,6 +40,10 @@ export default function SkillsManager() {
     }
   };
 
+  const existingCategories = useMemo(() => 
+    Array.from(new Set(skills.map(s => s.category)))
+  , [skills]);
+
   const handleAddSkill = () => {
     if (!currentCategory) {
       toast.error('Please enter a category first');
@@ -49,14 +54,19 @@ export default function SkillsManager() {
       return;
     }
 
-    const existingSkill = editingSkill ?? {
-      category: currentCategory,
+    // Find any existing category (case-insensitive)
+    const existingCategory = existingCategories.find(
+      c => c.toLowerCase() === currentCategory.toLowerCase()
+    );
+
+    const skillData = editingSkill ?? {
+      category: existingCategory || currentCategory,
       items: []
     };
 
     const updatedSkill = {
-      ...existingSkill,
-      items: [...existingSkill.items, currentSkill]
+      ...skillData,
+      items: [...skillData.items, currentSkill]
     };
 
     saveSkill(updatedSkill);
@@ -205,14 +215,13 @@ export default function SkillsManager() {
         <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700">Category</label>
-            <input
-              type="text"
+            <CategoryAutocomplete
               value={currentCategory}
-              onChange={(e) => setCurrentCategory(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#5C4B37] focus:ring-[#5C4B37]"
+              onChange={setCurrentCategory}
+              suggestions={existingCategories}
               placeholder="e.g., Programming Languages, Tools, Frameworks"
-              required
               disabled={isEditing}
+              className="mt-1"
             />
           </div>
           
