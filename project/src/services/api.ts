@@ -47,8 +47,8 @@ export const authApi = {
 };
 
 // Content API base class
-class ContentApi {
-  private token: string | null = null;
+export class ContentApi {
+  protected token: string | null = null;
 
   setToken(token: string | null) {
     this.token = token;

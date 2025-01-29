@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import {
+  import {
   LayoutDashboard,
   FileText,
   Briefcase,
@@ -10,7 +10,8 @@ import {
   Code2,
   LogOut,
   ChevronDown,
-  ChevronRight
+  ChevronRight,
+  BarChart
 } from 'lucide-react';
 
 interface MenuChildItem {
@@ -48,10 +49,11 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
 
   const [expandedSections, setExpandedSections] = useState<string[]>(['resume']);
 
-  const menuItems: MenuItem[] = [
+    const menuItems: MenuItem[] = [
     { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/admin/about', label: 'About', icon: FileText },
     { path: '/admin/projects', label: 'Projects', icon: Code2 },
+    { path: '/admin/analytics', label: 'Analytics', icon: BarChart },
     {
       label: 'Resume',
       icon: FileText,
