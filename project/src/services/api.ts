@@ -211,19 +211,31 @@ export const experienceApi = new class extends ContentApi {
   }
 };
 
+export interface SkillItem {
+  name: string;
+  level: number;
+}
+
+export interface Skill {
+  _id: string;
+  category: string;
+  items: SkillItem[];
+  order?: number;
+}
+
 export const skillsApi = new class extends ContentApi {
-  async getAll() {
+  async getAll(): Promise<Skill[]> {
     return this.fetchApi('/skills');
   }
 
-  async create(skills: any) {
+  async create(skills: Omit<Skill, '_id'>): Promise<Skill> {
     return this.fetchApi('/skills', {
       method: 'POST',
       body: JSON.stringify(skills),
     });
   }
 
-  async update(id: string, skills: any) {
+  async update(id: string, skills: Omit<Skill, '_id'>): Promise<Skill> {
     return this.fetchApi(`/skills/${id}`, {
       method: 'PUT',
       body: JSON.stringify(skills),
@@ -236,7 +248,7 @@ export const skillsApi = new class extends ContentApi {
     });
   }
 
-  async reorder(items: any[]) {
+  async reorder(items: Skill[]): Promise<Skill[]> {
     return this.fetchApi('/skills/reorder', {
       method: 'PUT',
       body: JSON.stringify({ items }),

@@ -21,11 +21,15 @@ interface Education {
   description: string;
 }
 
+interface SkillItem {
+  name: string;
+  level: number;
+}
+
 interface Skill {
   _id: string;
   category: string;
-  name: string;
-  level: number;
+  items: SkillItem[];
 }
 
 interface SectionData {
@@ -66,13 +70,10 @@ const Resume = () => {
     fetchData();
   }, []);
 
-  const groupedSkills = sectionData.skills.reduce((acc, skill) => {
-    if (!acc[skill.category]) {
-      acc[skill.category] = [];
-    }
-    acc[skill.category].push(skill);
-    return acc;
-  }, {} as Record<string, Skill[]>);
+  const groupedSkills = sectionData.skills.reduce((acc, skill) => ({
+    ...acc,
+    [skill.category]: skill.items
+  }), {} as Record<string, SkillItem[]>);
 
   const renderSection = (section: ResumeSectionType) => {
     switch (section) {
@@ -127,21 +128,20 @@ const Resume = () => {
                 <div key={category} className="space-y-4">
                   <h4 className="font-medium text-[#5C4B37]">{category}</h4>
                   <div className="space-y-3">
-                    {skills.map((skill) => (
-                      <div key={skill._id} className="bg-[#E6D5AC]/20 p-3 rounded-lg">
-                        <div className="flex justify-between items-center mb-2">
+                    {skills.map((skill, index) => (
+                      <div key={index} className="bg-[#E6D5AC]/20 p-3 rounded-lg">
+                        <div className="flex justify-between items-center">
                           <span className="text-[#2C1810] font-medium">{skill.name}</span>
-                          <span className="text-[#5C4B37] text-sm">Level {skill.level}/5</span>
-                        </div>
-                        <div className="flex gap-1">
-                          {[...Array(5)].map((_, i) => (
-                            <div
-                              key={i}
-                              className={`h-1.5 flex-1 rounded-full ${
-                                i < skill.level ? 'bg-[#2C1810]' : 'bg-[#E6D5AC]'
-                              }`}
-                            />
-                          ))}
+                          <div className="flex gap-1">
+                            {[...Array(5)].map((_, i) => (
+                              <div
+                                key={i}
+                                className={`w-1.5 h-1.5 rounded-full ${
+                                  i < skill.level ? 'bg-[#2C1810]' : 'bg-[#E6D5AC]'
+                                }`}
+                              />
+                            ))}
+                          </div>
                         </div>
                       </div>
                     ))}

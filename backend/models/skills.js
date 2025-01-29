@@ -10,11 +10,18 @@ const skillsSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  items: {
-    type: [String],
-    required: true,
-    default: []
-  }
+  items: [{
+    name: {
+      type: String,
+      required: true
+    },
+    level: {
+      type: Number,
+      required: true,
+      min: 1,
+      max: 5
+    }
+  }]
 }, {
   timestamps: true
 });
