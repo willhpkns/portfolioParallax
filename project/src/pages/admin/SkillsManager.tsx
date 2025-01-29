@@ -157,7 +157,14 @@ export default function SkillsManager() {
             <div className="w-full">
               <h3 className="text-xl font-semibold text-[#2C1810]">{skill.category}</h3>
               <div className="mt-4 space-y-2 w-full">
-                {skill.items.map((item, index) => (
+                {[...skill.items].sort((a, b) => {
+                  // Sort by level first (descending)
+                  if (b.level !== a.level) {
+                    return b.level - a.level;
+                  }
+                  // Then by name (alphabetically)
+                  return a.name.localeCompare(b.name);
+                }).map((item, index) => (
                   <div
                     key={index}
                     className="bg-gray-50 p-3 rounded-lg flex justify-between items-center"

@@ -128,7 +128,14 @@ const Resume = () => {
                 <div key={category} className="space-y-4">
                   <h4 className="font-medium text-[#5C4B37]">{category}</h4>
                   <div className="space-y-3">
-                    {skills.map((skill, index) => (
+                    {[...skills].sort((a, b) => {
+                      // Sort by level first (descending)
+                      if (b.level !== a.level) {
+                        return b.level - a.level;
+                      }
+                      // Then by name (alphabetically)
+                      return a.name.localeCompare(b.name);
+                    }).map((skill, index) => (
                       <div key={index} className="bg-[#E6D5AC]/20 p-3 rounded-lg">
                         <div className="flex justify-between items-center">
                           <span className="text-[#2C1810] font-medium">{skill.name}</span>
