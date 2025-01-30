@@ -1,12 +1,32 @@
 const geoip = require('geoip-lite');
 const useragent = require('express-useragent');
 const Visitor = require('../models/visitor');
+const jwt = require('jsonwebtoken');
 
 const analyticsMiddleware = async (req, res, next) => {
   try {
-    // Skip analytics routes and static files
-    if (req.path.startsWith('/api/analytics') || req.path.includes('.')) {
+    // Skip analytics routes, admin routes, static files, and authenticated admin users
+    if (req.path.startsWith('/api/analytics') || 
+        req.path.startsWith('/admin') || 
+        req.path.startsWith('/api/admin') || 
+        req.path.includes('.')) {
       return next();
+    }
+
+    // Check for admin user from auth token
+    const authHeader = req.headers.authorization;
+    if (authHeader) {
+      const token = authHeader.split(' ')[1];
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        if (decoded) {
+          // Skip tracking for authenticated admin users
+          return next();
+        }
+      } catch (err) {
+        // Token verification failed, continue with tracking
+        console.log('Analytics: Invalid auth token, continuing with tracking');
+      }
     }
 
     console.log('Analytics: Processing request -', {

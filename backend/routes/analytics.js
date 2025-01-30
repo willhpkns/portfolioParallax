@@ -12,29 +12,43 @@ router.get('/overview', auth, async (req, res) => {
     const today = moment().startOf('day');
     const lastMonth = moment().subtract(30, 'days').startOf('day');
 
+    // Exclude admin paths from all queries
+    const excludeAdminPaths = {
+      page: { $not: /^\/admin/ }
+    };
+
     // Get total visitors today
     const todayVisitors = await Visitor.countDocuments({
-      timestamp: { $gte: today.toDate() }
+      timestamp: { $gte: today.toDate() },
+      ...excludeAdminPaths
     });
 
     // Get total visitors this month
     const monthlyVisitors = await Visitor.countDocuments({
-      timestamp: { $gte: lastMonth.toDate() }
+      timestamp: { $gte: lastMonth.toDate() },
+      ...excludeAdminPaths
     });
 
     // Get unique visitors today
     const uniqueTodayVisitors = await Visitor.distinct('ip', {
-      timestamp: { $gte: today.toDate() }
+      timestamp: { $gte: today.toDate() },
+      ...excludeAdminPaths
     });
 
     // Get unique visitors this month
     const uniqueMonthlyVisitors = await Visitor.distinct('ip', {
-      timestamp: { $gte: lastMonth.toDate() }
+      timestamp: { $gte: lastMonth.toDate() },
+      ...excludeAdminPaths
     });
 
     // Get most visited pages
     const popularPages = await Visitor.aggregate([
-      { $match: { timestamp: { $gte: lastMonth.toDate() } } },
+      { 
+        $match: { 
+          timestamp: { $gte: lastMonth.toDate() },
+          page: { $not: /^\/admin/ }
+        } 
+      },
       { $group: { _id: '$page', count: { $sum: 1 } } },
       { $sort: { count: -1 } },
       { $limit: 5 }
@@ -70,7 +84,8 @@ router.get('/geography', auth, async (req, res) => {
       {
         $match: {
           'location.country': { $exists: true, $ne: null },
-          timestamp: { $gte: lastMonth.toDate() }
+          timestamp: { $gte: lastMonth.toDate() },
+          page: { $not: /^\/admin/ }
         }
       },
       {
@@ -119,7 +134,8 @@ router.get('/daily', auth, async (req, res) => {
     const dailyVisitors = await Visitor.aggregate([
       {
         $match: {
-          timestamp: { $gte: lastMonth.toDate() }
+          timestamp: { $gte: lastMonth.toDate() },
+          page: { $not: /^\/admin/ }
         }
       },
       {
@@ -158,7 +174,12 @@ router.get('/devices', auth, async (req, res) => {
 
     const [browsers, operatingSystems, devices] = await Promise.all([
       Visitor.aggregate([
-        { $match: { timestamp: { $gte: lastMonth.toDate() } } },
+        { 
+          $match: { 
+            timestamp: { $gte: lastMonth.toDate() },
+            page: { $not: /^\/admin/ }
+          } 
+        },
         {
           $group: {
             _id: '$userAgent.browser',
@@ -168,7 +189,12 @@ router.get('/devices', auth, async (req, res) => {
         { $sort: { count: -1 } }
       ]),
       Visitor.aggregate([
-        { $match: { timestamp: { $gte: lastMonth.toDate() } } },
+        { 
+          $match: { 
+            timestamp: { $gte: lastMonth.toDate() },
+            page: { $not: /^\/admin/ }
+          } 
+        },
         {
           $group: {
             _id: '$userAgent.os',
@@ -178,7 +204,12 @@ router.get('/devices', auth, async (req, res) => {
         { $sort: { count: -1 } }
       ]),
       Visitor.aggregate([
-        { $match: { timestamp: { $gte: lastMonth.toDate() } } },
+        { 
+          $match: { 
+            timestamp: { $gte: lastMonth.toDate() },
+            page: { $not: /^\/admin/ }
+          } 
+        },
         {
           $group: {
             _id: '$userAgent.isMobile',

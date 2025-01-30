@@ -4,7 +4,8 @@ import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps
 import { analyticsApi, AnalyticsData, DailyVisitors, DeviceStats, LocationData } from '../../services/analyticsApi';
 import AdminLayout from '../../components/admin/AdminLayout';
 
-const geoUrl = "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
+// Using a more reliable source for the world map data
+const geoUrl = "https://unpkg.com/world-atlas@2/countries-110m.json";
 
 export default function Analytics() {
   const [overview, setOverview] = useState<AnalyticsData | null>(null);
@@ -13,6 +14,7 @@ export default function Analytics() {
   const [locations, setLocations] = useState<LocationData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [mapError, setMapError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -119,27 +121,48 @@ export default function Analytics() {
       <div className="bg-white p-4 rounded-lg shadow">
         <h3 className="text-lg font-semibold mb-4">Geographical Distribution</h3>
         <div className="h-[400px]">
-          <ComposableMap>
-            <Geographies geography={geoUrl}>
-              {({ geographies }) =>
-                geographies.map((geo) => (
-                  <Geography
-                    key={geo.rsmKey}
-                    geography={geo}
-                    fill="#EAEAEC"
-                    stroke="#D6D6DA"
-                  />
-                ))
-              }
-            </Geographies>
-            {locations.flatMap(country =>
-              country.cities.map(city => (
-                <Marker key={`${country._id}-${city.name}`} coordinates={[city.coordinates.lng, city.coordinates.lat]}>
-                  <circle r={Math.log(city.count + 1) * 2} fill="#F00" fillOpacity={0.5} />
-                </Marker>
-              ))
-            )}
-          </ComposableMap>
+          {mapError ? (
+            <div className="text-red-500 p-4">{mapError}</div>
+          ) : (
+            <ComposableMap>
+              <Geographies geography={geoUrl}>
+                {({ geographies }) =>
+                  geographies?.map((geo) => (
+                    <Geography
+                      key={geo.rsmKey}
+                      geography={geo}
+                      fill="#EAEAEC"
+                      stroke="#D6D6DA"
+                    />
+                  ))
+                }
+              </Geographies>
+              {locations.flatMap(country =>
+                country.cities
+                  .filter(city => city.coordinates && 
+                    !isNaN(city.coordinates.lat) && 
+                    !isNaN(city.coordinates.lng))
+                  .map(city => {
+                    console.log('Rendering marker:', {
+                      city: city.name,
+                      coordinates: city.coordinates
+                    });
+                    return (
+                      <Marker 
+                        key={`${country._id}-${city.name}`} 
+                        coordinates={[city.coordinates.lng, city.coordinates.lat]}
+                      >
+                        <circle 
+                          r={Math.log(city.count + 1) * 2} 
+                          fill="#F00" 
+                          fillOpacity={0.5} 
+                        />
+                      </Marker>
+                    );
+                  })
+              )}
+            </ComposableMap>
+          )}
         </div>
       </div>
 
