@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { ComposableMap, Geographies, Geography, Marker } from "react-simple-maps";
+import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from "react-simple-maps";
 import { analyticsApi, AnalyticsData, DailyVisitors, DeviceStats, LocationData } from '../../services/analyticsApi';
 import AdminLayout from '../../components/admin/AdminLayout';
 
@@ -118,50 +118,68 @@ export default function Analytics() {
       </div>
 
       {/* World Map */}
-      <div className="bg-white p-4 rounded-lg shadow">
+      <div className="bg-white p-4 rounded-lg shadow overflow-hidden">
         <h3 className="text-lg font-semibold mb-4">Geographical Distribution</h3>
-        <div className="h-[400px]">
+        <div className="h-[400px] relative">
           {mapError ? (
             <div className="text-red-500 p-4">{mapError}</div>
           ) : (
-            <ComposableMap>
-              <Geographies geography={geoUrl}>
-                {({ geographies }) =>
-                  geographies?.map((geo) => (
-                    <Geography
-                      key={geo.rsmKey}
-                      geography={geo}
-                      fill="#EAEAEC"
-                      stroke="#D6D6DA"
-                    />
-                  ))
-                }
-              </Geographies>
-              {locations.flatMap(country =>
-                country.cities
-                  .filter(city => city.coordinates && 
-                    !isNaN(city.coordinates.lat) && 
-                    !isNaN(city.coordinates.lng))
-                  .map(city => {
-                    console.log('Rendering marker:', {
-                      city: city.name,
-                      coordinates: city.coordinates
-                    });
-                    return (
-                      <Marker 
-                        key={`${country._id}-${city.name}`} 
-                        coordinates={[city.coordinates.lng, city.coordinates.lat]}
-                      >
-                        <circle 
-                          r={Math.log(city.count + 1) * 2} 
-                          fill="#F00" 
-                          fillOpacity={0.5} 
+            <div className="relative">
+              <ComposableMap className="absolute inset-0">
+                <ZoomableGroup center={[0, 30]} zoom={1}>
+                  <Geographies geography={geoUrl}>
+                    {({ geographies }) => 
+                      geographies?.map(geo => (
+                        <Geography
+                          key={geo.rsmKey}
+                          geography={geo}
+                          fill="#EAEAEC"
+                          stroke="#D6D6DA"
                         />
-                      </Marker>
-                    );
-                  })
-              )}
-            </ComposableMap>
+                      ))
+                    }
+                  </Geographies>
+                  {locations.flatMap(country =>
+                    country.cities
+                      .filter(city => city.coordinates && 
+                        !isNaN(city.coordinates.lat) && 
+                        !isNaN(city.coordinates.lng))
+                      .map(city => {
+                        const maxCount = Math.max(...locations.flatMap(c => c.cities.map(ci => ci.count)));
+                        const intensity = city.count / maxCount;
+                        const color = `rgb(${Math.round(255 * intensity)}, 0, ${Math.round(255 * (1 - intensity))})`;
+                        
+                        return (
+                          <Marker 
+                            key={`${country._id}-${city.name}`} 
+                            coordinates={[city.coordinates.lng, city.coordinates.lat]}
+                          >
+                            <g>
+                              <circle 
+                                r={Math.log(city.count + 1) * 1.5} 
+                                fill={color}
+                                fillOpacity={0.7}
+                                stroke="#FFF"
+                                strokeWidth={0.5}
+                              />
+                              <title>{`${city.name}: ${city.count} visitor${city.count === 1 ? '' : 's'}`}</title>
+                            </g>
+                          </Marker>
+                        );
+                      })
+                  )}
+                </ZoomableGroup>
+              </ComposableMap>
+              <div className="absolute bottom-2 right-2 bg-white/80 p-2 rounded shadow text-xs">
+                <div className="flex items-center space-x-2">
+                  <span>Visitors:</span>
+                  <div className="flex items-center space-x-1">
+                    <div className="w-3 h-3 rounded-full" style={{background: 'linear-gradient(to right, rgb(255,0,255), rgb(255,0,0))'}}></div>
+                    <span>Low → High</span>
+                  </div>
+                </div>
+              </div>
+            </div>
           )}
         </div>
       </div>
