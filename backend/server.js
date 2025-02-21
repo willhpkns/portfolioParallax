@@ -15,7 +15,7 @@ const app = express();
 
 // Basic middleware
 app.use(cors({
-  origin: ['http://localhost:3000', 'https://willhpkns.soon.it'],
+  origin: ['http://localhost:5173', 'https://willhpkns.soon.it'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']

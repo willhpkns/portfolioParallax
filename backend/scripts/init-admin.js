@@ -16,7 +16,7 @@ const createAdminUser = async () => {
     // Create fresh admin user
     await Admin.create({
       username: process.env.ADMIN_USERNAME || 'admin',
-      password: process.env.ADMIN_PASSWORD || 'admin123'  // Will be hashed by the pre-save hook
+      password: process.env.ADMIN_PASSWORD || 'admin'  // Will be hashed by the pre-save hook
     });
     console.log('Admin user reset successfully');
   } catch (error) {
