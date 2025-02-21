@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export interface LoginCredentials {
   username: string;
@@ -21,6 +21,7 @@ export const authApi = {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
       body: JSON.stringify(credentials),
     });
 
@@ -36,6 +37,7 @@ export const authApi = {
       headers: {
         Authorization: `Bearer ${token}`,
       },
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -64,6 +66,7 @@ export class ContentApi {
     const response = await fetch(`${API_BASE_URL}/content${endpoint}`, {
       ...options,
       headers,
+      credentials: 'include',
     });
 
     if (!response.ok) {
@@ -162,6 +165,7 @@ export const educationApi = new class extends ContentApi {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
     });
     return response.json();
   }
@@ -206,6 +210,7 @@ export const experienceApi = new class extends ContentApi {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
     });
     return response.json();
   }
@@ -262,6 +267,7 @@ export const skillsApi = new class extends ContentApi {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include',
     });
     return response.json();
   }
