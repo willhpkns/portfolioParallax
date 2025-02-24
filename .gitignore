@@ -1,0 +1,28 @@
+# Root level dependencies
+/node_modules
+/package-lock.json
+
+# Frontend dependencies (already handled by project/.gitignore)
+/project/node_modules
+/project/dist
+/project/package-lock.json
+
+# Backend dependencies (already handled by backend/.gitignore)
+/backend/node_modules
+/backend/package-lock.json
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Editor and OS files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
