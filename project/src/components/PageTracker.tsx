@@ -1,18 +1,17 @@
-import { useEffect, useRef } from 'react';
+import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const PageTracker = () => {
   const location = useLocation();
-  const lastTrackedPath = useRef(location.pathname);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const trackPageView = async () => {
-      // Don't track if it's the same path (prevents double tracking on initial load)
-      if (lastTrackedPath.current === location.pathname) {
+      // Skip tracking for admin routes
+      if (location.pathname.startsWith('/admin') || isAuthenticated) {
         return;
       }
-
-      lastTrackedPath.current = location.pathname;
 
       try {
         const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -32,7 +31,7 @@ const PageTracker = () => {
 
     // Track the page view
     trackPageView();
-  }, [location.pathname]); // Re-run when path changes
+  }, [location.pathname, isAuthenticated]); // Re-run when path or auth state changes
 
   return null; // This component doesn't render anything
 };
