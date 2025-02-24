@@ -5,10 +5,9 @@ const jwt = require('jsonwebtoken');
 
 const analyticsMiddleware = async (req, res, next) => {
   try {
-    // Skip analytics routes, admin routes, static files, and authenticated admin users
-    if (req.path.startsWith('/api/analytics') || 
+    // Skip all API routes, admin routes, static files, and authenticated admin users
+    if (req.path.startsWith('/api/') || 
         req.path.startsWith('/admin') || 
-        req.path.startsWith('/api/admin') || 
         req.path.includes('.')) {
       return next();
     }
@@ -81,7 +80,7 @@ const analyticsMiddleware = async (req, res, next) => {
         platform: ua.platform,
         isMobile: ua.isMobile
       },
-      page: req.path.startsWith('/api/') ? req.headers.referer || '/' : req.path,
+      page: req.headers.referer || req.path,
       referrer: req.headers.referer || req.headers.referrer
     });
 
