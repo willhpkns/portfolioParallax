@@ -1,15 +1,13 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
 
 const PageTracker = () => {
   const location = useLocation();
-  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const trackPageView = async () => {
-      // Skip tracking for admin routes
-      if (location.pathname.startsWith('/admin') || isAuthenticated) {
+      // Only skip admin routes
+      if (location.pathname.startsWith('/admin')) {
         return;
       }
 
@@ -19,7 +17,9 @@ const PageTracker = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
           },
+          credentials: 'include',
           body: JSON.stringify({
             page: window.location.href,
           }),
@@ -29,11 +29,10 @@ const PageTracker = () => {
       }
     };
 
-    // Track the page view
     trackPageView();
-  }, [location.pathname, isAuthenticated]); // Re-run when path or auth state changes
+  }, [location.pathname]); // Only re-run when path changes
 
-  return null; // This component doesn't render anything
+  return null;
 };
 
 export default PageTracker;

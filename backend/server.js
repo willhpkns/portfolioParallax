@@ -16,7 +16,7 @@ app.use(cors({
   origin: ['http://localhost:5173', 'https://willhpkns.soon.it'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept']
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
