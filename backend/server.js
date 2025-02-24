@@ -8,8 +8,6 @@ const path = require('path');
 const authRoutes = require('./routes/auth');
 const contentRoutes = require('./routes/content');
 const analyticsRoutes = require('./routes/analytics');
-const analyticsMiddleware = require('./middleware/analytics');
-
 // Create Express app
 const app = express();
 
@@ -52,9 +50,6 @@ const connectWithRetry = () => {
 };
 
 connectWithRetry();
-
-// Track visitor analytics for all routes except /api/analytics
-app.use(analyticsMiddleware);
 
 // Mount API routes
 app.use('/api/auth', authRoutes);

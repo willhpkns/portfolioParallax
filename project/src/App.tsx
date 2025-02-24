@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
+import PageTracker from './components/PageTracker';
 import { Toaster } from 'react-hot-toast';
 import { aboutApi, projectApi } from './services/api';
 import ParallaxBackground from './components/ParallaxBackground';
@@ -225,6 +226,7 @@ function App() {
   return (
     <Router>
       <AuthProvider>
+        <PageTracker />
       <div className="relative min-h-screen bg-[#F5EDE0] overflow-hidden">
         <ParallaxBackground />
         <div className="relative z-50">
