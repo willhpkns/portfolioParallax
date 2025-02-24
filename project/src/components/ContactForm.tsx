@@ -38,7 +38,7 @@ const ContactForm = () => {
 
       await emailjs.send(
         'williamraymondhopkins', // Service ID
-        'template_2g2atwh', // Template ID
+        'template_fpnr6km', // Template ID
         templateParams,
         'qts6bev5KZTWG3Rks' // Public Key
       );
