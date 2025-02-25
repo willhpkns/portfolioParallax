@@ -91,9 +91,9 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5EDE0] flex flex-col">
-      {/* Header */}
-      <header className="fixed top-0 left-0 right-0 h-16 bg-[#2C1810] text-white z-50 flex items-center justify-between px-4 shadow-md">
+    <div className="min-h-screen bg-[#F5EDE0] flex">
+      {/* Mobile Header */}
+      <header className="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#2C1810] text-white z-50 flex items-center justify-between px-4 shadow-md">
         <div className="flex items-center gap-4">
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -124,14 +124,16 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       {/* Sidebar */}
       <aside 
         className={`
-          fixed md:static top-16 left-0 bottom-0 z-40
+          fixed md:static ${!isMobileMenuOpen ? '-translate-x-full' : 'translate-x-0'} md:translate-x-0
+          top-16 md:top-0 left-0 bottom-0 z-40
           w-64 bg-[#2C1810] text-white
           transform transition-transform duration-300 ease-in-out
-          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
-          md:translate-x-0
         `}
       >
         <div className="h-full flex flex-col">
+          <div className="p-4 md:block hidden">
+            <h2 className="text-xl font-bold">Admin Panel</h2>
+          </div>
           <nav className="flex-1">
             <ul className="space-y-1 p-2">
               {menuItems.map((item) => {
@@ -219,7 +221,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 pt-24 overflow-auto relative z-10 md:ml-0">
+      <main className="flex-1 p-8 md:p-8 mt-16 md:mt-0 overflow-auto relative z-10">
         <div className="max-w-7xl mx-auto admin">
           {children}
         </div>
