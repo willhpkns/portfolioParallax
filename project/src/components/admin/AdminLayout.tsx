@@ -11,7 +11,9 @@ import { useAuth } from '../../contexts/AuthContext';
   LogOut,
   ChevronDown,
   ChevronRight,
-  BarChart
+  BarChart,
+  Menu,
+  X
 } from 'lucide-react';
 
 interface MenuChildItem {
@@ -48,6 +50,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const location = useLocation();
 
   const [expandedSections, setExpandedSections] = useState<string[]>(['resume']);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     const menuItems: MenuItem[] = [
     { path: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -88,13 +91,47 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5EDE0] flex">
+    <div className="min-h-screen bg-[#F5EDE0] flex flex-col">
+      {/* Header */}
+      <header className="fixed top-0 left-0 right-0 h-16 bg-[#2C1810] text-white z-50 flex items-center justify-between px-4 shadow-md">
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="md:hidden p-2 rounded-lg hover:bg-[#5C4B37] transition-colors"
+          >
+            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          </button>
+          <h2 className="text-xl font-bold">Admin Panel</h2>
+        </div>
+        
+        <button
+          onClick={handleLogout}
+          className="flex items-center gap-2 text-gray-300 hover:text-white px-4 py-2 rounded-lg transition-colors hover:bg-[#5C4B37]/50 md:hidden"
+        >
+          <LogOut size={18} />
+          <span className="sr-only">Logout</span>
+        </button>
+      </header>
+
+      {/* Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-[#2C1810] text-white">
+      <aside 
+        className={`
+          fixed md:static top-16 left-0 bottom-0 z-40
+          w-64 bg-[#2C1810] text-white
+          transform transition-transform duration-300 ease-in-out
+          ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}
+          md:translate-x-0
+        `}
+      >
         <div className="h-full flex flex-col">
-          <div className="p-4">
-            <h2 className="text-xl font-bold">Admin Panel</h2>
-          </div>
           <nav className="flex-1">
             <ul className="space-y-1 p-2">
               {menuItems.map((item) => {
@@ -182,7 +219,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 p-8 overflow-auto relative z-10">
+      <main className="flex-1 p-8 pt-24 overflow-auto relative z-10 md:ml-0">
         <div className="max-w-7xl mx-auto admin">
           {children}
         </div>
