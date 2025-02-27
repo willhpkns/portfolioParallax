@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { aboutApi, projectApi, educationApi, experienceApi, skillsApi, settingsApi } from '../services/api';
 import { analyticsApi } from '../services/analyticsApi';
+import { pixelApi } from '../services/pixelApi';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -41,6 +42,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       skillsApi.setToken(token);
       settingsApi.setToken(token);
       analyticsApi.setToken(token); // Set token for analytics API
+      pixelApi.setToken(token); // Set token for pixel API
     } else {
       localStorage.removeItem('token');
       setIsAuthenticated(false);
@@ -52,6 +54,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       skillsApi.setToken(null);
       settingsApi.setToken(null);
       analyticsApi.setToken(null); // Clear token for analytics API
+      pixelApi.setToken(null); // Clear token for pixel API
     }
   }, [token]);
 

@@ -4,14 +4,11 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 
-// Import routes
-const authRoutes = require('./routes/auth');
-const contentRoutes = require('./routes/content');
-const analyticsRoutes = require('./routes/analytics');
 // Create Express app
 const app = express();
 
 // Basic middleware
+console.log('Setting up middleware...');
 app.use(cors({
   origin: ['http://localhost:5173', 'https://willhpkns.soon.it'],
   credentials: true,
@@ -49,12 +46,77 @@ const connectWithRetry = () => {
   });
 };
 
-connectWithRetry();
+// Initialize models with retry logic
+const initializeModels = async (retries = 3) => {
+  try {
+    console.log('Initializing models...');
+    
+    // Initialize models
+    await Promise.all([
+      require('./models/pixel').init().catch(err => {
+        console.warn('Pixel model initialization warning:', err);
+        return Promise.resolve();
+      }),
+      require('./models/pixelHistory').init().catch(err => {
+        console.warn('PixelHistory model initialization warning:', err);
+        return Promise.resolve();
+      }),
+      require('./models/settings').init().catch(err => {
+        console.warn('Settings model initialization warning:', err);
+        return Promise.resolve();
+      })
+    ]);
+    
+    console.log('Models initialized successfully');
+    return true;
+  } catch (error) {
+    console.error('Error initializing models:', error);
+    if (retries > 0) {
+      console.log(`Retrying model initialization... (${retries} attempts remaining)`);
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      return initializeModels(retries - 1);
+    }
+    return false;
+  }
+};
 
-// Mount API routes
+// Import and mount routes immediately
+console.log('Importing routes...');
+const authRoutes = require('./routes/auth');
+const contentRoutes = require('./routes/content');
+const analyticsRoutes = require('./routes/analytics');
+const pixelRoutes = require('./routes/pixels');
+
+console.log('Mounting auth routes...');
 app.use('/api/auth', authRoutes);
+console.log('Auth routes mounted at /api/auth');
+
+console.log('Mounting other routes...');
 app.use('/api/content', contentRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/pixels', pixelRoutes);
+console.log('All routes mounted');
+
+// Debug: Print all registered routes
+console.log('\nRegistered Routes:');
+app._router.stack.forEach(function(r){
+  if (r.route && r.route.path){
+    console.log(`${Object.keys(r.route.methods).join(', ').toUpperCase()} ${r.route.path}`);
+  }
+});
+
+// Connect to MongoDB and initialize models
+console.log('\nInitializing database connection...');
+connectWithRetry();
+
+// Initialize models
+initializeModels().then(success => {
+  if (!success) {
+    console.error('Failed to initialize models after retries');
+    process.exit(1);
+  }
+  console.log('Models initialized successfully');
+});
 
 // Error monitoring for MongoDB connection
 mongoose.connection.on('error', err => {

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-  import {
+import {
   LayoutDashboard,
   FileText,
   Briefcase,
@@ -13,7 +13,8 @@ import { useAuth } from '../../contexts/AuthContext';
   ChevronRight,
   BarChart,
   Menu,
-  X
+  X,
+  Grid
 } from 'lucide-react';
 
 interface MenuChildItem {
@@ -57,6 +58,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { path: '/admin/about', label: 'About', icon: FileText },
     { path: '/admin/projects', label: 'Projects', icon: Code2 },
     { path: '/admin/analytics', label: 'Analytics', icon: BarChart },
+    { path: '/admin/pixelboard', label: 'Pixel Board', icon: Grid },
     {
       label: 'Resume',
       icon: FileText,

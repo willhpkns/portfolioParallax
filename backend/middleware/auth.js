@@ -17,4 +17,22 @@ const auth = (req, res, next) => {
   }
 };
 
-module.exports = auth;
+const isAdmin = (req, res, next) => {
+  try {
+    // First run the auth middleware
+    auth(req, res, () => {
+      // Check if user exists and is admin
+      if (!req.user || !req.user.isAdmin) {
+        return res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+      }
+      next();
+    });
+  } catch (err) {
+    res.status(403).json({ message: 'Access denied. Admin privileges required.' });
+  }
+};
+
+module.exports = {
+  auth,
+  isAdmin
+};

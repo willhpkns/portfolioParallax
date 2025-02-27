@@ -1,6 +1,6 @@
 import React from 'react';
-import { Menu, X, User, Mail, Briefcase, Code, FileText, Github, Linkedin } from 'lucide-react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Menu, X, User, Mail, Code, FileText, Github, Linkedin, Grid } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface SideMenuProps {
   isOpen: boolean;
@@ -22,7 +22,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, toggleMenu }) => {
     e.preventDefault();
     toggleMenu();
 
-    if (path === '/resume') {
+    if (path === '/resume' || path === '/pixelboard') {
       navigate(path);
       return;
     }
@@ -46,6 +46,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, toggleMenu }) => {
     { icon: User, text: 'About Me', path: '/about' },
     { icon: Code, text: 'Projects', path: '/projects' },
     { icon: FileText, text: 'Resume', path: '/resume' },
+    { icon: Grid, text: 'Pixel Board', path: '/pixelboard' },
     { icon: Mail, text: 'Contact', path: '/contact' },
   ];
 

@@ -12,6 +12,8 @@ import ProjectsManager from './pages/admin/ProjectsManager';
 import EducationManager from './pages/admin/EducationManager';
 import SkillsManager from './pages/admin/SkillsManager';
 import ExperienceManager from './pages/admin/ExperienceManager';
+import PixelBoardManager from './pages/admin/PixelBoardManager';
+import PixelBoard from './pages/PixelBoard';
 import SideMenu from './components/SideMenu';
 import ScrollReveal from './components/ScrollReveal';
 import Resume from './pages/Resume';
@@ -239,6 +241,7 @@ function App() {
           <Route path="/about" element={<Home />} />
           <Route path="/projects" element={<Home />} />
           <Route path="/contact" element={<Home />} />
+          <Route path="/pixelboard" element={<PixelBoard />} />
           
           {/* Admin Routes */}
           <Route path="/admin" element={<AdminLogin />} />
@@ -251,6 +254,7 @@ function App() {
             <Route path="/admin/experience" element={<ExperienceManager />} />
             <Route path="/admin/resume-preview" element={<ResumePreview />} />
             <Route path="/admin/analytics" element={<Analytics />} />
+            <Route path="/admin/pixelboard" element={<PixelBoardManager />} />
           </Route>
         </Routes>
         <ScrollToTop />
