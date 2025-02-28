@@ -138,6 +138,12 @@ export default function PixelBoard() {
                 className="w-24 px-2 py-1 border rounded text-center"
               />
             </div>
+            {/* Rate Limit Info */}
+            {nextAllowedTime && new Date() < nextAllowedTime && (
+              <div className="mt-4 text-center text-[#5C4B37]">
+                Next pixel in: {Math.ceil((nextAllowedTime.getTime() - Date.now()) / 1000)}s
+              </div>
+            )}
           </div>
 
           {/* Pixel Grid */}
@@ -170,13 +176,6 @@ export default function PixelBoard() {
             )}
           </div>
         </div>
-
-        {/* Rate Limit Info */}
-        {nextAllowedTime && new Date() < nextAllowedTime && (
-          <div className="mt-4 text-center text-[#5C4B37]">
-            Next pixel in: {Math.ceil((nextAllowedTime.getTime() - Date.now()) / 1000)}s
-          </div>
-        )}
       </div>
     </div>
   );

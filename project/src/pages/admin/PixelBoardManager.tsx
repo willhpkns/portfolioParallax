@@ -19,6 +19,11 @@ interface HourStat {
   count: number;
 }
 
+interface RecentColor {
+  color: string;
+  timestamp: number;
+}
+
 const PixelModal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }) => {
   if (!isOpen) return null;
 
@@ -37,21 +42,6 @@ const PixelModal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: (
     </div>
   );
 };
-
-const GridCoordinates = () => (
-  <>
-    <div className="absolute left-12 right-4 top-0 flex justify-between px-2">
-      {[0, 25, 50, 75, 99].map(x => (
-        <span key={x} className="text-xs text-gray-500">{x}</span>
-      ))}
-    </div>
-    <div className="absolute top-12 bottom-4 left-0 flex flex-col justify-between py-2">
-      {[0, 25, 50, 75, 99].map(y => (
-        <span key={y} className="text-xs text-gray-500 w-8 text-right">{y}</span>
-      ))}
-    </div>
-  </>
-);
 
 export default function PixelBoardManager(): JSX.Element {
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -75,7 +65,7 @@ export default function PixelBoardManager(): JSX.Element {
   const [playbackSpeed, setPlaybackSpeed] = useState(2);
   const [stats, setStats] = useState<PixelStats | null>(null);
   const [loading, setLoading] = useState(true);
-
+  
   useEffect(() => {
     loadData();
   }, []);
@@ -150,17 +140,60 @@ export default function PixelBoardManager(): JSX.Element {
     setPlaybackSpeed(multiplier);
   };
 
+  const renderGrid = (currentPixel: Pixel, grid: (Pixel | null)[][]): JSX.Element => (
+    <div className="relative w-full overflow-auto">
+      <div 
+        className="relative w-full bg-gray-50 border border-gray-100 rounded-lg p-2"
+        style={{
+          width: isFullscreen ? '90vh' : '65vh',
+          height: isFullscreen ? '90vh' : '65vh',
+          margin: '0 auto',
+          aspectRatio: '1/1'
+        }}
+      >
+        <div
+          className="grid bg-white rounded-lg h-full"
+          style={{
+            gridTemplateColumns: `repeat(${currentSettings.boardSize}, 1fr)`,
+            gridTemplateRows: `repeat(${currentSettings.boardSize}, 1fr)`,
+            gap: '1px',
+            backgroundColor: '#E5E7EB'
+          }}
+        >
+          {Array(currentSettings.boardSize).fill(null).map((_, x) =>
+            Array(currentSettings.boardSize).fill(null).map((_, y) => {
+              const pixel = grid[y][x];
+              return (
+                <div
+                  key={`${x}-${y}`}
+                  className={`w-full h-full ${
+                    x === currentPixel.x && y === currentPixel.y
+                      ? 'ring-2 ring-[#2C1810] ring-offset-[0.5px] z-20'
+                      : ''
+                  }`}
+                  style={{
+                    backgroundColor: pixel ? pixel.color : '#FFFFFF'
+                  }}
+                />
+              );
+            })
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   const renderStats = (): JSX.Element | null => {
     if (!stats) return null;
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid md:grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-lg font-semibold mb-2">Total Pixels</h3>
           <p className="text-2xl font-bold">{stats.totalPixels}</p>
         </div>
         
-        <div className="bg-white p-4 rounded-lg shadow">
+        <div className="bg-white p-4 rounded-lg shadow col-span-2">
           <h3 className="text-lg font-semibold mb-2">Most Used Colors</h3>
           <div className="flex flex-wrap gap-2">
             {(stats.colorStats as ColorStat[]).slice(0, 5).map(({ _id, count }) => (
@@ -194,60 +227,6 @@ export default function PixelBoardManager(): JSX.Element {
     );
   };
 
-  const renderGrid = (currentPixel: Pixel, grid: (Pixel | null)[][]): JSX.Element => (
-    <div className="relative w-full overflow-auto rounded-lg">
-      <GridCoordinates />
-      <div 
-        className="relative w-full bg-gray-50 border border-gray-200 rounded-lg p-4 ml-8 mt-8"
-        style={{
-          maxWidth: isFullscreen ? '90vh' : '70vh',
-          maxHeight: isFullscreen ? '90vh' : '70vh',
-          margin: '0 auto',
-          aspectRatio: '1/1'
-        }}
-      >
-        <div
-          className="grid bg-white p-2 rounded-lg h-full"
-          style={{
-            gridTemplateColumns: `repeat(${currentSettings.boardSize}, 1fr)`,
-            gridTemplateRows: `repeat(${currentSettings.boardSize}, 1fr)`,
-            gap: '1px',
-            backgroundColor: '#E5E7EB'
-          }}
-        >
-          {Array(currentSettings.boardSize).fill(null).map((_, x) =>
-            Array(currentSettings.boardSize).fill(null).map((_, y) => {
-              const pixel = grid[y][x]; // Swapped x and y here
-              return (
-                <div
-                  key={`${x}-${y}`}
-                  className={`group relative transition-all w-full h-full min-w-[4px] min-h-[4px] ${
-                    x === currentPixel.x && y === currentPixel.y
-                      ? 'ring-2 ring-[#2C1810] ring-offset-[0.5px] z-20 scale-110'
-                      : ''
-                  } ${
-                    x % 10 === 0 && y % 10 === 0 ? 'border-r border-b border-gray-300' :
-                    x % 10 === 0 ? 'border-r border-gray-200' :
-                    y % 10 === 0 ? 'border-b border-gray-200' : 
-                    'hover:ring-1 hover:ring-gray-300'
-                  }`}
-                  style={{
-                    backgroundColor: pixel ? pixel.color : '#FFFFFF'
-                  }}
-                  title={`${x}, ${y}${pixel ? ` - ${pixel.color}` : ''}`}
-                >
-                  <div className="hidden group-hover:block absolute -top-6 left-1/2 -translate-x-1/2 bg-black/75 text-white text-xs px-2 py-1 rounded z-30">
-                    {x}, {y}
-                  </div>
-                </div>
-              );
-            })
-          )}
-        </div>
-      </div>
-    </div>
-  );
-
   const renderPixelBoard = () => {
     if (!timelapseData) return <div>No data available</div>;
 
@@ -264,99 +243,137 @@ export default function PixelBoardManager(): JSX.Element {
       }
     });
 
-    const pixelInfo = (
-      <div className="bg-white p-4 rounded-lg shadow-md">
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <span className="text-sm text-gray-500 block mb-1">Position</span>
-            <div className="flex items-center bg-gray-50 px-3 py-2 rounded">
-              <span className="font-medium">{currentPixel.x}, {currentPixel.y}</span>
-            </div>
-          </div>
-          <div>
-            <span className="text-sm text-gray-500 block mb-1">Progress</span>
-            <div className="flex items-center bg-gray-50 px-3 py-2 rounded">
-              <span className="font-medium">
-                {Math.round((currentStateIndex / (timelapseData.states.length - 1)) * 100)}%
-              </span>
-            </div>
-          </div>
-          <div className="col-span-2">
-            <span className="text-sm text-gray-500 block mb-1">Color</span>
-            <div className="flex items-center gap-3 bg-gray-50 px-3 py-2 rounded">
-              <div 
-                className="w-8 h-8 rounded-md border border-gray-200"
-                style={{ backgroundColor: currentPixel.color }}
-              />
-              <code className="text-sm">{currentPixel.color}</code>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-
-    const gridContent = (
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <h3 className="font-semibold text-lg text-[#2C1810]">Pixel Board Replay</h3>
-            <span className="text-sm text-gray-500">
-              {new Date(timelapseData.states[currentStateIndex].timestamp).toLocaleTimeString()}
-            </span>
-          </div>
-          <button
-            onClick={() => setIsFullscreen(true)}
-            className="p-2 hover:bg-gray-100 rounded-full"
-          >
-            <Maximize2 size={20} />
-          </button>
-        </div>
-        {renderGrid(currentPixel, grid)}
-        <div className="mt-4">
-          {pixelInfo}
-        </div>
-      </div>
-    );
-
     return (
-      <>
-        <div className="bg-white p-4 rounded-lg shadow-md w-full">
-          {gridContent}
+      <div className="space-y-4">
+        <div className="flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+          <div className="flex-1 grid grid-cols-3 gap-4">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handlePlayPause}
+                className="p-2 rounded-full hover:bg-white"
+              >
+                {isPlaying ? <Pause size={20} /> : <Play size={20} />}
+              </button>
+              <span className="text-sm">{playbackSpeed}x</span>
+            </div>
+            <input
+              type="range"
+              min={0}
+              max={timelapseData.states.length - 1}
+              value={currentStateIndex}
+              onChange={(e) => handleSliderChange(parseInt(e.target.value))}
+              className="w-full"
+            />
+            <div className="flex items-center justify-end gap-2">
+              <button
+                onClick={() => handleSpeedChange(Math.max(0.5, playbackSpeed / 2))}
+                className="p-2 rounded-full hover:bg-white"
+              >
+                <Rewind size={20} />
+              </button>
+              <button
+                onClick={() => handleSpeedChange(Math.min(8, playbackSpeed * 2))}
+                className="p-2 rounded-full hover:bg-white"
+              >
+                <FastForward size={20} />
+              </button>
+              <button
+                onClick={() => setIsFullscreen(true)}
+                className="p-2 rounded-full hover:bg-white"
+              >
+                <Maximize2 size={20} />
+              </button>
+            </div>
+          </div>
         </div>
-        <PixelModal isOpen={isFullscreen} onClose={() => setIsFullscreen(false)}>
-          {gridContent}
-        </PixelModal>
-      </>
+
+        <div className="grid md:grid-cols-[1fr_300px] gap-4">
+          <div className="bg-white rounded-lg shadow-sm">
+            {renderGrid(currentPixel, grid)}
+          </div>
+          <div className="space-y-4">
+            <div className="bg-white p-4 rounded-lg shadow-sm">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <span className="text-sm text-gray-500 block mb-1">Position</span>
+                  <div className="flex items-center bg-gray-50 px-3 py-2 rounded">
+                    <span className="font-medium">{currentPixel.x}, {currentPixel.y}</span>
+                  </div>
+                </div>
+                <div>
+                  <span className="text-sm text-gray-500 block mb-1">Timestamp</span>
+                  <div className="flex items-center bg-gray-50 px-3 py-2 rounded">
+                    <span className="font-medium text-sm">
+                      {new Date(timelapseData.states[currentStateIndex].timestamp).toLocaleTimeString()}
+                    </span>
+                  </div>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-sm text-gray-500 block mb-1">Color</span>
+                  <div className="flex items-center gap-3 bg-gray-50 px-3 py-2 rounded">
+                    <div 
+                      className="w-8 h-8 rounded-md border border-gray-200"
+                      style={{ backgroundColor: currentPixel.color }}
+                    />
+                    <code className="text-sm">{currentPixel.color}</code>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-lg shadow-sm">
+              <h3 className="text-sm font-medium text-gray-700 mb-2">Progress</h3>
+              <div className="flex justify-between items-center text-sm text-gray-600">
+                <span>{currentStateIndex + 1} / {timelapseData.states.length}</span>
+                <span>{Math.round((currentStateIndex / (timelapseData.states.length - 1)) * 100)}%</span>
+              </div>
+              <div className="h-2 bg-gray-100 rounded-full mt-2 overflow-hidden">
+                <div 
+                  className="h-full bg-[#2C1810] transition-all duration-300"
+                  style={{
+                    width: `${(currentStateIndex / (timelapseData.states.length - 1)) * 100}%`
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     );
   };
 
   return (
     <AdminLayout>
       <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-[#2C1810]">Pixel Board Manager</h1>
-          <button
-            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
-            className="flex items-center gap-2 px-4 py-2 bg-[#2C1810] text-white rounded-lg hover:bg-[#5C4B37]"
-          >
-            <Settings size={20} />
-            Settings
-          </button>
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <h1 className="text-3xl font-bold text-[#2C1810]">Pixel Board Manager</h1>
+            <button
+              onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+              className="flex items-center gap-2 px-4 py-2 bg-[#2C1810] text-white rounded-lg hover:bg-[#5C4B37]"
+            >
+              <Settings size={20} />
+              Settings
+            </button>
+          </div>
         </div>
 
         {isSettingsOpen && (
           <div className="bg-white p-6 rounded-lg shadow-md space-y-4">
             <h2 className="text-xl font-semibold mb-4">Board Settings</h2>
             <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Rate Limit (seconds)</label>
-                <input
-                  type="number"
-                  value={draftSettings.rateLimit}
-                  onChange={(e) => setDraftSettings(prev => ({ ...prev, rateLimit: parseInt(e.target.value) }))}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#5C4B37] focus:ring-[#5C4B37]"
-                  min="1"
-                />
+              <div className="border-t pt-4 mt-4">
+                <h3 className="text-sm font-medium text-gray-700 mb-4">Advanced Settings</h3>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">Rate Limit (seconds)</label>
+                  <input
+                    type="number"
+                    value={draftSettings.rateLimit}
+                    onChange={(e) => setDraftSettings(prev => ({ ...prev, rateLimit: parseInt(e.target.value) }))}
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-[#5C4B37] focus:ring-[#5C4B37]"
+                    min="1"
+                  />
+                </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700">Maintenance Mode</label>
@@ -389,49 +406,7 @@ export default function PixelBoardManager(): JSX.Element {
 
         {renderStats()}
 
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <div className="space-y-6">
-            {timelapseData && (
-              <div className="flex items-center gap-4 mb-4">
-                <input
-                  type="range"
-                  min={0}
-                  max={timelapseData.states.length - 1}
-                  value={currentStateIndex}
-                  onChange={(e) => handleSliderChange(parseInt(e.target.value))}
-                  className="w-full"
-                />
-                <span className="text-sm text-gray-600 whitespace-nowrap min-w-[100px]">
-                  {currentStateIndex + 1} / {timelapseData.states.length}
-                </span>
-              </div>
-            )}
-
-            <div className="flex justify-center gap-4 items-center">
-              <button
-                onClick={handlePlayPause}
-                className="p-2 rounded-full hover:bg-gray-100"
-              >
-                {isPlaying ? <Pause size={24} /> : <Play size={24} />}
-              </button>
-              <button
-                onClick={() => handleSpeedChange(Math.max(0.5, playbackSpeed / 2))}
-                className="p-2 rounded-full hover:bg-gray-100"
-              >
-                <Rewind size={24} />
-              </button>
-              <button
-                onClick={() => handleSpeedChange(Math.min(8, playbackSpeed * 2))}
-                className="p-2 rounded-full hover:bg-gray-100"
-              >
-                <FastForward size={24} />
-              </button>
-              <span className="flex items-center">
-                {playbackSpeed}x Speed
-              </span>
-            </div>
-          </div>
-          
+        <div className="bg-white p-4 rounded-lg shadow-md">
           {loading ? (
             <div className="text-center py-8">Loading...</div>
           ) : (
