@@ -152,9 +152,13 @@ export default function PixelBoard() {
               <div className="text-center py-8">Loading...</div>
             ) : (
               <div 
-                className="grid gap-0.5 bg-gray-100 p-2 rounded-lg"
+                className="grid gap-0.5 bg-gray-300 p-2 rounded-lg"
                 style={{
                   gridTemplateColumns: `repeat(${settings.boardSize}, minmax(4px, 1fr))`,
+                  backgroundImage: `linear-gradient(#00000010 1px, transparent 1px),
+                                  linear-gradient(90deg, #00000010 1px, transparent 1px)`,
+                  backgroundSize: `calc(100% / ${settings.boardSize}) calc(100% / ${settings.boardSize})`,
+                  willChange: 'transform',
                 }}
               >
                 {Array.from({ length: settings.boardSize * settings.boardSize }, (_, i) => {
@@ -167,6 +171,7 @@ export default function PixelBoard() {
                       className="aspect-square cursor-pointer hover:opacity-75 transition-opacity"
                       style={{ 
                         backgroundColor: pixel?.color || '#FFFFFF',
+                        willChange: 'background-color'
                       }}
                       onClick={() => handlePixelClick(x, y)}
                     />
