@@ -224,6 +224,15 @@ function Home() {
 
 function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
+  // Log auth status on app load
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    console.log('App auth check:', { 
+      hasToken: !!token,
+      tokenValue: token
+    });
+  }, []);
 
   return (
     <Router>

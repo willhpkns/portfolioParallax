@@ -46,7 +46,8 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const { logout } = useAuth();
+  const { logout, isAuthenticated, token } = useAuth();
+  console.log('AdminLayout auth state:', { isAuthenticated, token });
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -91,6 +92,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     logout();
     navigate('/admin');
   };
+
+  // Check authentication
+  if (!isAuthenticated || !token) {
+    console.log('Not authenticated in AdminLayout, redirecting...');
+    navigate('/admin');
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-[#F5EDE0] flex">

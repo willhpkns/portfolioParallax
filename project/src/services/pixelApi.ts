@@ -5,10 +5,12 @@ class BasePixelApi {
   protected token: string | null = null;
 
   setToken(token: string | null) {
+    console.log('Setting token in pixelApi:', token);
     this.token = token;
   }
 
   protected async fetchApi(endpoint: string, options: RequestInit = {}) {
+    console.log('fetchApi called with token:', this.token);
     const headers = {
       'Content-Type': 'application/json',
       ...(this.token && { Authorization: `Bearer ${this.token}` }),

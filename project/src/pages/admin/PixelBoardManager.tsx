@@ -89,12 +89,15 @@ export default function PixelBoardManager(): JSX.Element {
   }, [isPlaying, timelapseData, playbackSpeed]);
 
   const loadData = async () => {
+    console.log('Loading pixel board data...');
     try {
+      console.log('Fetching settings, stats, and timelapse data...');
       const [settingsData, statsData, timelapseData] = await Promise.all([
         pixelApi.getSettings(),
         pixelApi.getStats(),
         pixelApi.getTimelapse()
       ]);
+      console.log('Data retrieved:', { settingsData, statsData, timelapseData });
       setCurrentSettings(settingsData);
       setDraftSettings(settingsData);
       setStats(statsData);

@@ -1,0 +1,66 @@
+[33ma0d5e7b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mbackend[m[33m)[m feat: add rate limit information display to Pixel Board
+[33m2b229ec[m feat: add Pixel Board feature with admin management and API integration
+[33mebf6df5[m feat: improve AdminLayout with mobile header and responsive sidebar behavior
+[33ma18c55e[m feat: enhance AdminLayout with mobile menu toggle and responsive sidebar
+[33me26acfb[m feat: add README.md with project overview, features, technology stack, and setup instructions
+[33m8fa1509[m fix: update PageTracker to skip tracking only for admin routes and enhance server CORS headers
+[33m8fb3837[m fix: update PageTracker to skip tracking for admin routes and authenticated users
+[33m13e945c[m feat: implement PageTracker component for enhanced page view tracking and remove analytics middleware from server
+[33m396bfe5[m fix: refine analytics middleware to skip all API routes and improve page tracking logic
+[33m443b53a[m fix: update API base URL to use environment variable
+[33m618fb2e[m fix: update email template ID in ContactForm component
+[33m6216224[m fix: update email template ID in ContactForm component
+[33m0881e4f[m feat: enhance package.json scripts for production and build processes; add frontend and backend commands
+[33m8f8b933[m feat: add package.json and .gitignore for fullstack project setup; include dev scripts and dependencies
+[33mb78092c[m Merge branch 'backend' of https://github.com/willhpkns/portfolioParallax into backend
+[33mf4b3e56[m feat: update CORS origin for development environment and remove unused updateOrder methods from API services
+[33me5d5a1c[m fix: update admin password default value and adjust CORS origin for development environment
+[33mdcfd4dd[m feat: update CORS configuration and API base URL for environment variables; include credentials in API requests
+[33m02dca1c[m fix: correct case of Admin model import in init-admin script
+[33md657243[m fix: correct case of Admin model import in authentication routes
+[33m69c03e8[m feat: reset admin user on initialization by deleting existing user before creation
+[33mebf75a8[m feat: enhance admin analytics map with zoomable functionality and dynamic city markers based on visitor count
+[33m181a600[m feat: enhance analytics middleware and routes to exclude admin paths and authenticated users; update map data source in admin analytics
+[33m6848f31[m feat: implement analytics tracking with visitor data collection and middleware integration
+[33mc785b6b[m feat: sort skills and items by level and name in Resume and SkillsManager components
+[33m8ef43fc[m feat: enhance skills management with category merging and autocomplete functionality
+[33m6f7c6bf[m feat: update skills model to include structured items with name and level; add SkillLevelSelector component
+[33md552241[m feat: add @dnd-kit/modifiers dependency and enhance drag-and-drop functionality with improved drag handling
+[33m2dc3a19[m refactor: remove order property from DraggableItems and related managers; update order handling logic
+[33me349e00[m drag and drop for reorder. (super sensitive)
+[33m9a07341[m feat: add order field to education, experience, and skills models; implement reorder API endpoints
+[33mf03481b[m feat: implement settings model and API for managing resume section order
+[33mc17d36f[m feat: add ResumePreview page and integrate it into AdminLayout for better resume management
+[33m3a40d14[m refactor: enhance AdminLayout with expandable menu sections for better navigation
+[33m8b697bf[m refactor: update experience model to include start and end dates, and enhance Resume and ExperienceManager components to display experience data
+[33med872fa[m style: enhance admin panel input styling and update layout class
+[33me5c38f4[m refactor education and skills models, update Resume component to fetch and display structured data
+[33m9712c8c[m add z-index to main content in AdminLayout for improved stacking context
+[33me1cecf3[m enhance error handling in API responses, improve authentication middleware, and add project logging in routes
+[33m3389bf5[m add name, position, and profile image fields to about model and update API integration
+[33m94fb3b5[m fetch and display dynamic about content in Home component
+[33meb9b72f[m enhance authentication context to manage API tokens and handle access denial
+[33m5c2af30[m add education and skills management features to admin panel
+[33m2d76727[m implement authentication context and protected routes for admin panel
+[33ma66c13d[m add README for portfolio backend setup and API documentation
+[33m4b777f3[m backend
+[33ma0f37ab[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m removed go up button from mobile
+[33m2de4135[m go to top button
+[33mdc525cf[m hover button color
+[33md20d41c[m button visibility
+[33m98b867e[m[33m ([m[1;32mmain[m[33m)[m build: add @emailjs/browser dependency
+[33mf68afbd[m feat: implement functional contact form with EmailJS integration
+[33mf508b97[m feat: implement proper page routing and section navigation
+[33m1081724[m Change tab name
+[33m200bcb3[m test auto deployment
+[33md1d9d6e[m Add Nginx configuration
+[33m11520be[m Enhanced server.js with keep-alive and comprehensive logging
+[33m4358126[m Enhanced server.js with better error handling and logging
+[33m7f4c454[m Update server.js to use ES modules
+[33mfdf506c[m Update package.json with express and start script
+[33m03e17b8[m server.js
+[33m500ab87[m ball imrpovement
+[33m4495faf[m Responsive view
+[33m223c434[m side menu fix
+[33mb23eec7[m better balls
+[33m7c0a144[m first commit

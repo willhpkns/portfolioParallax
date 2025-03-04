@@ -25,25 +25,39 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // Initialize token state for APIs on mount
   useEffect(() => {
     const currentToken = localStorage.getItem('token');
+    console.log('AuthContext initialization:', { currentToken });
     if (currentToken) {
       setToken(currentToken);
+      console.log('Setting initial token for APIs');
+      // Set token on all content APIs
+      aboutApi.setToken(currentToken);
+      projectApi.setToken(currentToken);
+      educationApi.setToken(currentToken);
+      experienceApi.setToken(currentToken);
+      skillsApi.setToken(currentToken);
+      settingsApi.setToken(currentToken);
+      analyticsApi.setToken(currentToken);
+      pixelApi.setToken(currentToken);
     }
   }, []);
 
   useEffect(() => {
+    console.log('Token changed:', token);
     if (token) {
       localStorage.setItem('token', token);
       setIsAuthenticated(true);
       // Set token on all content APIs
+      console.log('Setting token on APIs after change');
       aboutApi.setToken(token);
       projectApi.setToken(token);
       educationApi.setToken(token);
       experienceApi.setToken(token);
       skillsApi.setToken(token);
       settingsApi.setToken(token);
-      analyticsApi.setToken(token); // Set token for analytics API
-      pixelApi.setToken(token); // Set token for pixel API
+      analyticsApi.setToken(token); 
+      pixelApi.setToken(token);
     } else {
+      console.log('Clearing token from APIs');
       localStorage.removeItem('token');
       setIsAuthenticated(false);
       // Clear token from all content APIs
