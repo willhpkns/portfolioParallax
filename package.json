@@ -11,6 +11,7 @@
     "backend:prod": "cd backend && NODE_ENV=production npm run start",
     "prod": "npm run frontend:build && concurrently \"npm run frontend:start\" \"npm run backend:prod\"",
     "build": "npm run frontend:build"
+    
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
