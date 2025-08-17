@@ -11,26 +11,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Compute lowercase image path: ghcr.io/<owner_lc>/<repo_lc>
+      # compute lowercase image path for GHCR
       - name: Compute lowercase image name
         run: |
           OWNER="${{ github.repository_owner }}"
           REPO="${{ github.event.repository.name }}"
-          echo "OWNER_LC=$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
-          echo "REPO_LC=$(echo "$REPO" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
           echo "IMAGE=ghcr.io/$(echo "$OWNER" | tr '[:upper:]' '[:lower:]')/$(echo "$REPO" | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - uses: docker/setup-qemu-action@v3
       - uses: docker/setup-buildx-action@v3
 
-      - name: Login to GHCR
+      - name: Login to GHCR (push)
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & push multi-arch image (arm64 + amd64)
+      - name: Build & push multi-arch image
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -54,27 +52,16 @@ jobs:
           script: |
             set -e
             cd /srv/web
-
-            # Compute lowercase IMAGE again in this job
+            # login for private pulls (uses your repo secrets)
+            docker login ghcr.io -u "${{ secrets.GHCR_USER }}" -p "${{ secrets.GHCR_TOKEN }}"
+            # point compose to the lowercase image + backend tag (idempotent)
             OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
             REPO_LC=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
-            IMAGE="ghcr.io/${OWNER_LC}/${REPO_LC}"
-
-            # Login for private pulls (skip if your package is public)
-            docker login ghcr.io -u "${{ secrets.GHCR_USER }}" -p "${{ secrets.GHCR_TOKEN }}"
-
-            # Point compose at the lowercase image + backend tag
-            sed -i "s|^\\s*image: .*|    image: ${IMAGE}:backend-latest|" docker-compose.yml
-
-            # Remove any old http-echo command block if present
-            sed -n '/app:/,/^[^ ]/p' docker-compose.yml | grep -q 'http-echo' && \
-              sed -i '/command: \[.*http-echo.*/,/]/d' docker-compose.yml || true
-
+            IMAGE="ghcr.io/${OWNER_LC}/${REPO_LC}:backend-latest"
+            sed -i -E '/^  app:/,/^[^ ]/ s|^[[:space:]]*image:.*|    image: '"$IMAGE"'|' docker-compose.yml
+            # remove the old demo command if it ever sneaks back
+            sed -i -E '/^  app:/,/^[^ ]/ s/^[[:space:]]*command:.*//g' docker-compose.yml
             docker-compose pull app
-            docker-compose up -d app
-
-            # Health check your site
+            docker-compose up -d --force-recreate --no-deps app
             curl -fsS https://willhpkns.soon.it >/dev/null
-
-            # Cleanup
             docker image prune -f
