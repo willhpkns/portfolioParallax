@@ -28,7 +28,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & push multi-arch image
+      - name: Build & push frontend image
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -37,6 +37,17 @@ jobs:
           tags: |
             ${{ env.IMAGE }}:backend-latest
             ${{ env.IMAGE }}:backend-${{ github.sha }}
+
+      - name: Build & push API image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile.api
+          push: true
+          platforms: linux/arm64,linux/amd64
+          tags: |
+            ${{ env.IMAGE }}:api-latest
+            ${{ env.IMAGE }}:api-${{ github.sha }}
 
   deploy:
     needs: build-push
@@ -52,16 +63,36 @@ jobs:
           script: |
             set -e
             cd /srv/web
-            # login for private pulls (uses your repo secrets)
+            
+            # Create environment file with secrets
+            cat > .env <<'ENV'
+            MONGODB_URI=${{ secrets.MONGODB_URI }}
+            ENV
+            
+            # Login for private pulls
             docker login ghcr.io -u "${{ secrets.GHCR_USER }}" -p "${{ secrets.GHCR_TOKEN }}"
-            # point compose to the lowercase image + backend tag (idempotent)
+            
+            # Set image names
             OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
             REPO_LC=$(echo "${{ github.event.repository.name }}" | tr '[:upper:]' '[:lower:]')
-            IMAGE="ghcr.io/${OWNER_LC}/${REPO_LC}:backend-latest"
-            sed -i -E '/^  app:/,/^[^ ]/ s|^[[:space:]]*image:.*|    image: '"$IMAGE"'|' docker-compose.yml
-            # remove the old demo command if it ever sneaks back
+            FRONTEND_IMAGE="ghcr.io/${OWNER_LC}/${REPO_LC}:backend-latest"
+            API_IMAGE="ghcr.io/${OWNER_LC}/${REPO_LC}:api-latest"
+            
+            # Update docker-compose.yml with new images
+            sed -i -E '/^  app:/,/^[^ ]/ s|^[[:space:]]*image:.*|    image: '"$FRONTEND_IMAGE"'|' docker-compose.yml
+            sed -i -E '/^  api:/,/^[^ ]/ s|^[[:space:]]*image:.*|    image: '"$API_IMAGE"'|' docker-compose.yml
+            
+            # Remove old demo commands
             sed -i -E '/^  app:/,/^[^ ]/ s/^[[:space:]]*command:.*//g' docker-compose.yml
-            docker-compose pull app
-            docker-compose up -d --force-recreate --no-deps app
+            
+            # Pull and deploy both services
+            docker-compose pull app api
+            docker-compose up -d --force-recreate --no-deps app api
+            
+            # Health checks
             curl -fsS https://willhpkns.soon.it >/dev/null
+            sleep 5
+            curl -fsS https://willhpkns.soon.it/api/content/about >/dev/null || echo "API might still be starting up"
+            
+            # Cleanup
             docker image prune -f
