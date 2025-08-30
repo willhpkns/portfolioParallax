@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { pixelApi, type PixelBoardSettings, type PixelStats, type Pixel, type TimelapseData } from '../../services/pixelApi';
 import toast from 'react-hot-toast';
-import { Play, Pause, FastForward, Rewind, Settings, Maximize2, Minimize2 } from 'lucide-react';
+import { Play, Pause, FastForward, Rewind, Settings, Maximize2 } from 'lucide-react';
 
 interface ColorStat {
   _id: string;
@@ -18,30 +18,6 @@ interface HourStat {
   };
   count: number;
 }
-
-interface RecentColor {
-  color: string;
-  timestamp: number;
-}
-
-const PixelModal = ({ isOpen, onClose, children }: { isOpen: boolean; onClose: () => void; children: React.ReactNode }) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-lg w-full h-full max-w-[95vw] max-h-[95vh] flex flex-col">
-        <div className="flex justify-end p-2">
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full">
-            <Minimize2 size={24} />
-          </button>
-        </div>
-        <div className="flex-1 overflow-hidden p-4">
-          {children}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export default function PixelBoardManager(): JSX.Element {
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -65,6 +41,7 @@ export default function PixelBoardManager(): JSX.Element {
   const [playbackSpeed, setPlaybackSpeed] = useState(2);
   const [stats, setStats] = useState<PixelStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [timelapseLoading, setTimelapseLoading] = useState(false);
   
   useEffect(() => {
     loadData();
@@ -91,24 +68,38 @@ export default function PixelBoardManager(): JSX.Element {
   const loadData = async () => {
     console.log('Loading pixel board data...');
     try {
-      console.log('Fetching settings, stats, and timelapse data...');
-      const [settingsData, statsData, timelapseData] = await Promise.all([
+      console.log('Fetching settings and stats...');
+      const [settingsData, statsData] = await Promise.all([
         pixelApi.getSettings(),
-        pixelApi.getStats(),
-        pixelApi.getTimelapse()
+        pixelApi.getStats()
       ]);
-      console.log('Data retrieved:', { settingsData, statsData, timelapseData });
+      console.log('Basic data retrieved:', { settingsData, statsData });
       setCurrentSettings(settingsData);
       setDraftSettings(settingsData);
       setStats(statsData);
+    } catch (error) {
+      toast.error('Failed to load pixel board data');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadTimelapseData = async () => {
+    if (timelapseData || timelapseLoading) return; // Already loaded or loading
+    
+    setTimelapseLoading(true);
+    try {
+      console.log('Loading timelapse data...');
+      const timelapseData = await pixelApi.getTimelapse();
+      console.log('Timelapse data retrieved:', timelapseData);
       setTimelapseData(timelapseData);
       if (timelapseData.states.length > 0) {
         setBoardState(timelapseData.states[0].fullState);
       }
     } catch (error) {
-      toast.error('Failed to load pixel board data');
+      toast.error('Failed to load timelapse data');
     } finally {
-      setLoading(false);
+      setTimelapseLoading(false);
     }
   };
 
@@ -123,8 +114,11 @@ export default function PixelBoardManager(): JSX.Element {
     }
   };
 
-  const handlePlayPause = () => {
-    if (!timelapseData) return;
+  const handlePlayPause = async () => {
+    if (!timelapseData) {
+      await loadTimelapseData();
+      return;
+    }
     
     if (!isPlaying && currentStateIndex >= timelapseData.states.length - 1) {
       setCurrentStateIndex(0);
@@ -231,7 +225,23 @@ export default function PixelBoardManager(): JSX.Element {
   };
 
   const renderPixelBoard = () => {
-    if (!timelapseData) return <div>No data available</div>;
+    if (!timelapseData) {
+      return (
+        <div className="text-center py-12">
+          <h3 className="text-lg font-semibold text-gray-700 mb-4">Pixel Board Timelapse</h3>
+          <p className="text-gray-600 mb-6">
+            Load the timelapse data to view and replay pixel board changes over time.
+          </p>
+          <button
+            onClick={loadTimelapseData}
+            disabled={timelapseLoading}
+            className="px-6 py-3 bg-[#2C1810] text-white rounded-lg hover:bg-[#5C4B37] disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
+            {timelapseLoading ? 'Loading Timelapse...' : 'Load Timelapse Data'}
+          </button>
+        </div>
+      );
+    }
 
     const currentPixel = timelapseData.states[currentStateIndex]?.pixel;
     if (!currentPixel) return <div>No pixel data available</div>;

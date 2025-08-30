@@ -18,16 +18,14 @@ export default function AdminLogin() {
     try {
       const response = await authApi.login({ username, password });
       
-      // Handle the new token structure with refresh token
-      await new Promise<void>((resolve) => {
-        login(response.token, response.refreshToken);
-        // Wait for next tick to ensure auth state is updated
-        setTimeout(() => {
-          toast.success('Successfully logged in');
-          navigate('/admin/dashboard');
-          resolve();
-        }, 0);
-      });
+      // Set the tokens in auth context
+      login(response.token, response.refreshToken);
+      
+      // Wait a bit longer for auth state to update properly
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      toast.success('Successfully logged in');
+      navigate('/admin/dashboard');
     } catch (error: any) {
       // Handle rate limiting
       if (error.response?.status === 429) {

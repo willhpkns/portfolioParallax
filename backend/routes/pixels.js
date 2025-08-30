@@ -125,17 +125,23 @@ router.get('/history', isAdmin, async function(req, res) {
 // GET /api/pixels/history/timelapse - Get ordered history for timelapse
 router.get('/history/timelapse', isAdmin, async function(req, res) {
   try {
-    // Get sorted history for timelapse replay
+    // Get limited recent history for timelapse (last 1000 pixels to avoid performance issues)
+    const limit = parseInt(req.query.limit) || 1000;
     const history = await PixelHistory.find()
-      .sort({ createdAt: 1 }) // Sort by oldest first
+      .sort({ createdAt: -1 }) // Get most recent first
+      .limit(limit)
       .select('x y color createdAt')
       .lean();
 
-    // Calculate progressive states
-    const states = [];
-    const currentState = new Map(); // Track current state of each coordinate
+    // Reverse to get chronological order
+    history.reverse();
 
-    history.forEach((pixel) => {
+    // Calculate progressive states - but only store key snapshots to reduce payload
+    const states = [];
+    const currentState = new Map();
+    const snapshotInterval = Math.max(1, Math.floor(history.length / 100)); // Take ~100 snapshots max
+
+    history.forEach((pixel, index) => {
       // Update current state with new pixel
       const key = `${pixel.x},${pixel.y}`;
       currentState.set(key, {
@@ -144,21 +150,24 @@ router.get('/history/timelapse', isAdmin, async function(req, res) {
         color: pixel.color
       });
 
-      // Add current complete state to states array
-      states.push({
-        pixel: {
-          x: pixel.x,
-          y: pixel.y,
-          color: pixel.color
-        },
-        timestamp: pixel.createdAt,
-        fullState: Array.from(currentState.values())
-      });
+      // Only create snapshots at intervals or for the last pixel
+      if (index % snapshotInterval === 0 || index === history.length - 1) {
+        states.push({
+          pixel: {
+            x: pixel.x,
+            y: pixel.y,
+            color: pixel.color
+          },
+          timestamp: pixel.createdAt,
+          fullState: Array.from(currentState.values())
+        });
+      }
     });
 
     res.json({
-      totalPixels: states.length,
-      states: states
+      totalPixels: history.length,
+      states: states,
+      isLimited: history.length === limit
     });
   } catch (err) {
     res.status(500).json({ message: 'Error retrieving board state', error: err.message });

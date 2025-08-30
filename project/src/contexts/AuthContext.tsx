@@ -135,6 +135,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = (newToken: string, newRefreshToken: string) => {
     setToken(newToken);
     setRefreshTokenValue(newRefreshToken);
+    // Immediately set authenticated state
+    setIsAuthenticated(true);
+    // Update localStorage and API tokens
+    localStorage.setItem('token', newToken);
+    localStorage.setItem('refreshToken', newRefreshToken);
+    setApiTokens(newToken);
   };
 
   const logout = useCallback(() => {
