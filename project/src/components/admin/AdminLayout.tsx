@@ -46,8 +46,7 @@ interface AdminLayoutProps {
 }
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const { logout, isAuthenticated, token } = useAuth();
-  console.log('AdminLayout auth state:', { isAuthenticated, token });
+  const { logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -94,9 +93,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   };
 
   // Check authentication
-  if (!isAuthenticated || !token) {
-    console.log('Not authenticated in AdminLayout, redirecting...');
-    navigate('/admin');
+  if (!isAuthenticated) {
     return null;
   }
 

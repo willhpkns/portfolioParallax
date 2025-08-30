@@ -63,9 +63,20 @@ jobs:
             set -e
             cd /srv/web
             
-            # Create environment file with secrets
+            # Create environment file with enhanced security settings
             cat > .env <<'ENV'
             MONGODB_URI=${{ secrets.MONGODB_URI }}
+            ADMIN_USERNAME=${{ secrets.ADMIN_USERNAME }}
+            ADMIN_PASSWORD=${{ secrets.ADMIN_PASSWORD }}
+            JWT_SECRET=${{ secrets.JWT_SECRET }}
+            JWT_REFRESH_SECRET=${{ secrets.JWT_REFRESH_SECRET }}
+            JWT_EXPIRES_IN=15m
+            JWT_REFRESH_EXPIRES_IN=7d
+            NODE_ENV=production
+            RATE_LIMIT_WINDOW_MS=900000
+            RATE_LIMIT_MAX_REQUESTS=100
+            AUTH_RATE_LIMIT_MAX=5
+            AUTH_RATE_LIMIT_WINDOW_MS=900000
             ENV
             
             # Login for private pulls

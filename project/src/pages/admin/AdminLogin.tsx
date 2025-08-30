@@ -7,15 +7,20 @@ import { authApi } from '../../services/api';
 export default function AdminLogin() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    
     try {
       const response = await authApi.login({ username, password });
+      
+      // Handle the new token structure with refresh token
       await new Promise<void>((resolve) => {
-        login(response.token);
+        login(response.token, response.refreshToken);
         // Wait for next tick to ensure auth state is updated
         setTimeout(() => {
           toast.success('Successfully logged in');
@@ -23,9 +28,17 @@ export default function AdminLogin() {
           resolve();
         }, 0);
       });
-    } catch (error) {
-      toast.error('Invalid credentials');
+    } catch (error: any) {
+      // Handle rate limiting
+      if (error.response?.status === 429) {
+        const retryAfter = error.response.data?.retryAfter;
+        toast.error(`Too many login attempts. Try again in ${Math.ceil(retryAfter / 60)} minutes.`);
+      } else {
+        toast.error('Invalid credentials');
+      }
       console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -74,9 +87,10 @@ export default function AdminLogin() {
           <div>
             <button
               type="submit"
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#2C1810] hover:bg-[#5C4B37] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5C4B37]"
+              disabled={isLoading}
+              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-[#2C1810] hover:bg-[#5C4B37] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#5C4B37] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Sign in
+              {isLoading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
         </form>

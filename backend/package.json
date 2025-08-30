@@ -7,7 +7,8 @@
     "start": "node server.js",
     "dev": "nodemon server.js",
     "init-admin": "node scripts/init-admin.js",
-    "init-pixelboard": "node scripts/init-pixelboard.js"
+    "init-pixelboard": "node scripts/init-pixelboard.js",
+    "security-setup": "node scripts/security-setup.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -17,6 +18,7 @@
     "express-rate-limit": "^7.5.0",
     "express-useragent": "^1.0.15",
     "geoip-lite": "^1.4.10",
+    "helmet": "^7.1.0",
     "jsonwebtoken": "^9.0.0",
     "moment": "^2.30.1",
     "mongoose": "^7.0.3"

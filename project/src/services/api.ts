@@ -7,10 +7,15 @@ export interface LoginCredentials {
 
 export interface LoginResponse {
   token: string;
+  refreshToken: string;
   user: {
     id: string;
     username: string;
   };
+}
+
+export interface RefreshTokenRequest {
+  refreshToken: string;
 }
 
 // Authentication API
@@ -26,7 +31,27 @@ export const authApi = {
     });
 
     if (!response.ok) {
-      throw new Error('Invalid credentials');
+      const errorData = await response.json();
+      const error = new Error(errorData.message || 'Invalid credentials');
+      (error as any).response = { status: response.status, data: errorData };
+      throw error;
+    }
+
+    return response.json();
+  },
+
+  refreshToken: async (refreshTokenRequest: RefreshTokenRequest): Promise<LoginResponse> => {
+    const response = await fetch(`${API_BASE_URL}/auth/refresh`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(refreshTokenRequest),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to refresh token');
     }
 
     return response.json();
@@ -45,6 +70,17 @@ export const authApi = {
     }
 
     return response.json();
+  },
+
+  logout: async (): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+      method: 'POST',
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      throw new Error('Logout failed');
+    }
   },
 };
 
