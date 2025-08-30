@@ -84,9 +84,15 @@ jobs:
             # Remove old demo commands
             sed -i -E '/^  app:/,/^[^ ]/ s/^[[:space:]]*command:.*//g' docker-compose.yml
             
-            # Pull and deploy both services
-            docker-compose pull app api
-            docker-compose up -d --force-recreate --no-deps app api
+            # Pull and deploy services
+            docker-compose pull app
+            docker-compose up -d --force-recreate --no-deps app
+            
+            # Add API service if it exists, otherwise skip
+            if docker-compose config | grep -q "api:"; then
+              docker-compose pull api
+              docker-compose up -d --force-recreate --no-deps api
+            fi
             
             # Health checks
             curl -fsS https://willhpkns.soon.it >/dev/null
