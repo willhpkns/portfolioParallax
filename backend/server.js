@@ -116,6 +116,22 @@ initializeModels().then(success => {
     process.exit(1);
   }
   console.log('Models initialized successfully');
+  
+  // NOW register the 404 handler - after all routes are ready
+  app.use((req, res, next) => {
+    console.log('404 handler reached for:', req.method, req.url);
+    res.status(404).json({ message: 'Route not found' });
+  });
+
+  // Error handler
+  app.use((err, req, res, next) => {
+    console.error('Global error handler:', err);
+    const statusCode = err.statusCode || 500;
+    res.status(statusCode).json({
+      message: err.message || 'Something went wrong!',
+      ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    });
+  });
 });
 
 // Error monitoring for MongoDB connection
@@ -126,21 +142,6 @@ mongoose.connection.on('error', err => {
 mongoose.connection.on('disconnected', () => {
   console.log('MongoDB disconnected. Attempting to reconnect...');
   connectWithRetry();
-});
-
-// 404 handler
-app.use((req, res, next) => {
-  res.status(404).json({ message: 'Route not found' });
-});
-
-// Error handler
-app.use((err, req, res, next) => {
-  console.error('Global error handler:', err);
-  const statusCode = err.statusCode || 500;
-  res.status(statusCode).json({
-    message: err.message || 'Something went wrong!',
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
-  });
 });
 
 // Define port
