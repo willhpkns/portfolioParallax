@@ -2,276 +2,360 @@
 
 A modern, full-stack portfolio website featuring a parallax design, comprehensive content management system, and visitor analytics.
 
+## 🌟 Live Demo
+
+- **Website**: [https://willhpkns.soon.it](https://willhpkns.soon.it)
+- **Admin Panel**: [https://willhpkns.soon.it/admin](https://willhpkns.soon.it/admin)
+
 ## 🚀 Features
 
-### Frontend
+### 🎨 Frontend Features
 - **Parallax Background** - Dynamic, engaging scrolling effects
-- **Responsive Design** - Mobile-first approach using TailwindCSS
-- **Interactive Sections**
+- **Responsive Design** - Mobile-first approach with TailwindCSS
+- **Interactive Sections**:
+  - Hero section with animated terminal icon
   - About section with profile and bio
-  - Projects showcase with image support
-  - Skills presentation with categorization
-  - Contact form integration
+  - Projects showcase with image gallery
+  - Skills presentation with level indicators
+  - Contact form with EmailJS integration
   - Interactive resume with customizable sections
+  - Pixel Board - Interactive drawing canvas
 
-### Admin Panel
-- **Content Management**
-  - About section editor
-  - Projects manager with image upload
-  - Education history manager
+### 🔧 Admin Panel Features
+- **Content Management**:
+  - About section editor with paragraph management
+  - Projects manager with technology tags
+  - Education history with drag-and-drop ordering
   - Experience timeline editor
-  - Skills manager with categories
-- **Resume Customization**
+  - Skills manager with categories and levels
+- **Resume Customization**:
   - Drag-and-drop section reordering
-  - Preview mode for resume
-- **Analytics Dashboard**
-  - Visitor tracking
-  - Page view statistics
-  - User engagement metrics
+  - Live preview mode
+- **Analytics Dashboard**:
+  - Visitor tracking and statistics
+  - Page view metrics
+  - Geographic data visualization
+- **Pixel Board Management**:
+  - Real-time drawing canvas
+  - Timelapse visualization
+  - Settings and moderation controls
 
 ## 🛠️ Technology Stack
 
 ### Frontend
-- **Framework**: React with TypeScript
+- **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite
 - **Styling**: TailwindCSS
 - **Routing**: React Router DOM
-- **State Management**: React Context
-- **Form Handling**: React Hook Form
-- **Drag & Drop**: DND Kit
+- **State Management**: React Context API
+- **Drag & Drop**: @dnd-kit
 - **Maps**: React Simple Maps
 - **Charts**: Recharts
 - **Notifications**: React Hot Toast
-- **Email Integration**: EmailJS
+- **Email**: EmailJS integration
+- **Icons**: Lucide React
 
 ### Backend
 - **Runtime**: Node.js
-- **Framework**: Express
+- **Framework**: Express.js
 - **Database**: MongoDB with Mongoose
 - **Authentication**: JWT (JSON Web Tokens)
-- **Security**:
-  - CORS configuration
-  - Rate limiting
-  - Input validation
+- **Security**: CORS, Rate limiting, Input validation
 - **Analytics**: Custom visitor tracking system
 
-## 🏗️ Project Structure
+## 📁 Project Structure
 
 ```
-project/
-├── src/
-│   ├── components/       # Reusable UI components
-│   ├── contexts/         # React context providers
-│   ├── pages/           # Page components
-│   │   └── admin/       # Admin panel pages
-│   └── services/        # API service integrations
+portfolio/
+├── project/                    # Frontend (React/Vite)
+│   ├── src/
+│   │   ├── components/        # Reusable UI components
+│   │   ├── contexts/          # React context providers
+│   │   ├── pages/            # Page components
+│   │   │   └── admin/        # Admin panel pages
+│   │   └── services/         # API service integrations
+│   ├── .env.development      # Dev environment variables
+│   ├── .env.production       # Production environment variables
+│   └── nginx.conf            # Nginx configuration
 │
-backend/
-├── middleware/          # Express middleware
-├── models/             # Mongoose models
-├── routes/             # API routes
-└── scripts/            # Utility scripts
+├── backend/                   # Backend (Node.js/Express)
+│   ├── middleware/           # Express middleware
+│   ├── models/              # Mongoose database models
+│   ├── routes/              # API route handlers
+│   ├── scripts/             # Utility scripts
+│   └── .env                 # Backend environment variables
+│
+├── Dockerfile               # Frontend container
+├── Dockerfile.api          # Backend container
+├── package.json            # Root package with scripts
+└── .github/workflows/      # CI/CD deployment
 ```
 
-## 🚦 Getting Started
+## ⚡ Quick Start
 
 ### Prerequisites
-- Node.js 16+
-- MongoDB
+- Node.js 18+
+- MongoDB 4.4+
 - EmailJS account (for contact form)
 
-### Environment Variables
+### 1. Clone and Install
 
-#### Frontend (.env)
-```
-VITE_API_BASE_URL=http://localhost:5000
-VITE_EMAILJS_USER_ID=your_emailjs_user_id
-VITE_EMAILJS_TEMPLATE_ID=your_emailjs_template_id
-VITE_EMAILJS_SERVICE_ID=your_emailjs_service_id
-```
-
-#### Backend (.env)
-```
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret
-PORT=5000
-```
-
-### Installation
-
-1. Clone the repository:
 ```bash
-git clone [repository-url]
+git clone [your-repository-url]
+cd portfolioParallax
+npm install  # Installs all dependencies
 ```
 
-2. Install dependencies:
-```bash
-# Install root dependencies
-npm install
+### 2. Environment Setup
 
-# Install frontend dependencies
-cd project && npm install
+#### Backend Environment (Required)
+Create `backend/.env` from the example:
 
-# Install backend dependencies
-cd ../backend && npm install
-```
-
-3. Configure environment variables:
-
-Backend (create `.env` from template):
 ```bash
 cd backend
 cp .env.example .env
-# Edit .env with your settings:
-# - MONGODB_URI
-# - JWT_SECRET
-# - ADMIN_USERNAME
-# - ADMIN_PASSWORD
 ```
 
-Frontend development and production environments are pre-configured with API URLs.
+Edit `backend/.env`:
+```env
+# Database
+MONGODB_URI=mongodb://localhost:27017/portfolio
 
-4. Initialize admin user:
+# Security
+JWT_SECRET=your_super_secure_jwt_secret_minimum_32_characters
+JWT_EXPIRES_IN=24h
+
+# Admin Credentials
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=your_secure_admin_password
+
+# Server
+PORT=5000
+NODE_ENV=development
+CORS_ORIGIN=http://localhost:5173
+```
+
+#### Frontend Environment (Optional)
+The frontend environments are pre-configured, but you can customize:
+
+**Development** (`project/.env.development`):
+```env
+VITE_API_BASE_URL=http://localhost:5000/api
+VITE_EMAILJS_SERVICE_ID=your_service_id
+VITE_EMAILJS_TEMPLATE_ID=your_template_id
+VITE_EMAILJS_USER_ID=your_user_id
+```
+
+**Production** (`project/.env.production`):
+```env
+VITE_API_BASE_URL=https://willhpkns.soon.it/api
+VITE_EMAILJS_SERVICE_ID=your_service_id
+VITE_EMAILJS_TEMPLATE_ID=your_template_id
+VITE_EMAILJS_USER_ID=your_user_id
+```
+
+### 3. Database Setup
+
+Start MongoDB and initialize the admin user:
+
 ```bash
 cd backend
 npm run init-admin
 ```
 
-5. Running the application:
+### 4. Run the Application
 
-Development mode (from root directory):
+#### Development Mode
 ```bash
-# Run both frontend and backend concurrently
+# From root directory - runs both frontend and backend
 npm run dev
 
-# Or run individually:
-npm run frontend  # Frontend on http://localhost:5173
-npm run backend   # Backend on http://localhost:5000
+# Access:
+# Frontend: http://localhost:5173
+# Backend: http://localhost:5000
+# Admin Panel: http://localhost:5173/admin
 ```
 
-Production mode (from root directory):
+#### Production Mode
 ```bash
-# Build frontend and run both servers in production
+# Build and run in production
 npm run prod
 
-# Or run steps individually:
-npm run frontend:build   # Build frontend
-npm run frontend:start   # Serve frontend on http://localhost:3000
-npm run backend:prod     # Run backend in production mode
+# Access:
+# Frontend: http://localhost:3000
+# Backend: http://localhost:5000
+# Admin Panel: http://localhost:3000/admin
 ```
 
-## 🚀 Production Deployment
+## 🔐 Admin Panel Access
 
-### Server Configuration
+### First Time Setup
 
-The production setup uses:
-- Express server (port 3000) to serve the built frontend
-- Backend API server (port 5000)
-- Nginx as reverse proxy
+1. **Initialize Admin User**:
+   ```bash
+   cd backend
+   npm run init-admin
+   ```
 
-### Nginx Configuration
+2. **Access Admin Panel**:
+   - Development: `http://localhost:5173/admin`
+   - Production: `https://willhpkns.soon.it/admin`
 
-The included `nginx.conf` provides:
-- Reverse proxy to Express server
-- WebSocket support
-- Real IP forwarding
-- HTTP upgrade handling
+3. **Login** with credentials from your `backend/.env` file
 
-Example configuration:
+### Security Notes
+
+- JWT tokens expire after 24 hours (secure by design)
+- You'll need to log in again after token expiration
+- Passwords are hashed with bcrypt
+- All admin routes are protected
+- CORS is configured for your domains
+
+## 🚀 Deployment
+
+### Docker Deployment
+
+The project includes Docker configurations for both frontend and backend:
+
+```bash
+# Build frontend image
+docker build -f Dockerfile -t portfolio-frontend .
+
+# Build backend image  
+docker build -f Dockerfile.api -t portfolio-backend .
+```
+
+### Production Server Setup
+
+1. **Update Nginx Configuration** to proxy both frontend and API:
+
 ```nginx
 server {
     listen 80;
     server_name willhpkns.soon.it;
 
+    # API routes
+    location /api/ {
+        proxy_pass http://localhost:5000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # Frontend
     location / {
         proxy_pass http://localhost:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
         proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     }
 }
 ```
 
-### Health Monitoring
+2. **Run Both Services**:
+   - Frontend on port 3000
+   - Backend on port 5000
 
-- Health check endpoint: `GET /health`
-- Automatic keep-alive mechanism
-- Process event handling for uncaught exceptions
-- Graceful shutdown support
-
-## 🔑 API Endpoints
+## 📚 API Documentation
 
 ### Authentication
 - `POST /api/auth/login` - Admin login
 - `GET /api/auth/verify` - Verify JWT token
 
-### Content Management
-- `GET /api/content/about` - Get about information
-- `POST /api/content/about` - Update about section
+### Content Management (Protected Routes)
+- `GET/POST /api/content/about` - About section
 - `GET/POST/PUT/DELETE /api/content/projects` - Projects CRUD
 - `GET/POST/PUT/DELETE /api/content/education` - Education CRUD
 - `GET/POST/PUT/DELETE /api/content/experience` - Experience CRUD
 - `GET/POST/PUT/DELETE /api/content/skills` - Skills CRUD
 
+### Settings
+- `GET/POST /api/content/settings/resume-order` - Resume section ordering
+
 ### Analytics
 - `POST /api/analytics/track` - Track page views
 - `GET /api/analytics/stats` - Get visitor statistics
 
-## 🔐 Security Features
+## 🎨 Customization
 
-- JWT-based authentication
-- Protected admin routes
-- CORS configuration
-- Input validation
-- Rate limiting for API endpoints
-- Secure password hashing
+### Styling
+- Colors are defined in Tailwind config and used consistently
+- Primary colors: `#2C1810` (dark brown), `#5C4B37` (medium brown), `#E6D5AC` (light beige)
+- All components use these colors for consistency
 
-## 🔄 State Management
+### Content Management
+Use the admin panel to manage:
+- **About Section**: Personal info, bio paragraphs, profile image
+- **Projects**: Title, description, images, technology tags
+- **Education**: Institutions, degrees, dates, descriptions
+- **Experience**: Companies, positions, dates, technologies
+- **Skills**: Categories with items and proficiency levels
+- **Resume Order**: Drag and drop to reorder sections
 
-- React Context for auth state
-- Protected routes with role-based access
-- Centralized API service layer
-- Real-time form validation
-- Toast notifications for user feedback
+## 🔧 Development Commands
 
-## 📈 Analytics Features
+```bash
+# Root level commands
+npm run dev          # Run both frontend and backend in development
+npm run frontend     # Run only frontend development server
+npm run backend      # Run only backend development server
+npm run build        # Build frontend for production
+npm run prod         # Build and run in production mode
 
-- Page view tracking
-- Visitor statistics
-- User engagement metrics
-- Geographic data collection
-- Custom event tracking
+# Backend specific
+cd backend
+npm run dev          # Development with nodemon
+npm run start        # Production server
+npm run init-admin   # Initialize admin user
 
-## 🎨 Styling and UI
+# Frontend specific  
+cd project
+npm run dev          # Development server
+npm run build        # Build for production
+npm run preview      # Preview production build
+```
 
-- Responsive design with Tailwind CSS
-- Custom parallax effects
-- Smooth scroll animations
-- Dark/light mode support
-- Custom UI components
-- Interactive visualizations
+## 🐛 Troubleshooting
 
-## 📱 Mobile Responsiveness
+### Common Issues
 
-- Mobile-first approach
-- Responsive navigation
-- Touch-friendly interactions
-- Optimized images
-- Fluid typography
+1. **Can't access admin panel**:
+   - Ensure you've run `npm run init-admin`
+   - Check your MongoDB connection
+   - Verify environment variables are set
 
-## 🔧 Development Features
+2. **Database connection errors**:
+   - Make sure MongoDB is running
+   - Check your `MONGODB_URI` in `backend/.env`
 
-- Hot module replacement
-- TypeScript support
-- ESLint configuration
-- Development/Production environments
-- Automated build process
-- Source maps for debugging
+3. **Admin login issues**:
+   - Verify credentials in `backend/.env`
+   - Check browser console for errors
+   - Ensure backend is running on port 5000
 
-## 📄 License
+4. **API not connecting**:
+   - Check if backend is running
+   - Verify CORS settings
+   - Check environment variables for API URLs
+
+### Logs and Debugging
+
+- Backend logs: Check your terminal running the backend
+- Frontend errors: Check browser developer console
+- Database: Use MongoDB Compass or CLI to inspect data
+
+## 📝 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+---
+
+**Note**: This is a personal portfolio website. Customize the content, styling, and features to match your personal brand and requirements.
