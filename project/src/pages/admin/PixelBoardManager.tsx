@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import AdminLayout from '../../components/admin/AdminLayout';
 import { pixelApi, type PixelBoardSettings, type PixelStats, type Pixel, type TimelapseData } from '../../services/pixelApi';
 import toast from 'react-hot-toast';
@@ -35,13 +35,34 @@ export default function PixelBoardManager(): JSX.Element {
   });
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [timelapseData, setTimelapseData] = useState<TimelapseData | null>(null);
-  const [currentStateIndex, setCurrentStateIndex] = useState(0);
-  const [boardState, setBoardState] = useState<Pixel[]>([]);
+  const [currentChangeIndex, setCurrentChangeIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState(2);
   const [stats, setStats] = useState<PixelStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [timelapseLoading, setTimelapseLoading] = useState(false);
+
+  // Efficiently compute board state for current index
+  const currentBoardState = useMemo(() => {
+    if (!timelapseData || currentChangeIndex < 0) return [];
+    
+    const stateMap = new Map<string, Pixel>();
+    
+    // Apply all changes up to current index
+    for (let i = 0; i <= currentChangeIndex; i++) {
+      const change = timelapseData.changes[i];
+      if (change) {
+        const key = `${change.x},${change.y}`;
+        stateMap.set(key, {
+          x: change.x,
+          y: change.y,
+          color: change.color
+        });
+      }
+    }
+    
+    return Array.from(stateMap.values());
+  }, [timelapseData, currentChangeIndex]);
   
   useEffect(() => {
     loadData();
@@ -51,13 +72,12 @@ export default function PixelBoardManager(): JSX.Element {
     if (!isPlaying || !timelapseData) return;
 
     const interval = setInterval(() => {
-      setCurrentStateIndex(current => {
+      setCurrentChangeIndex(current => {
         const next = current + 1;
-        if (next >= timelapseData.states.length) {
+        if (next >= timelapseData.changes.length) {
           setIsPlaying(false);
           return current;
         }
-        setBoardState(timelapseData.states[next].fullState);
         return next;
       });
     }, 100 / playbackSpeed);
@@ -93,9 +113,8 @@ export default function PixelBoardManager(): JSX.Element {
       const timelapseData = await pixelApi.getTimelapse();
       console.log('Timelapse data retrieved:', timelapseData);
       setTimelapseData(timelapseData);
-      if (timelapseData.states.length > 0) {
-        setBoardState(timelapseData.states[0].fullState);
-      }
+      setCurrentChangeIndex(0); // Start at beginning
+      toast.success(`Loaded ${timelapseData.totalPixels} pixel changes`);
     } catch (error) {
       toast.error('Failed to load timelapse data');
     } finally {
@@ -120,65 +139,67 @@ export default function PixelBoardManager(): JSX.Element {
       return;
     }
     
-    if (!isPlaying && currentStateIndex >= timelapseData.states.length - 1) {
-      setCurrentStateIndex(0);
-      setBoardState(timelapseData.states[0].fullState);
+    if (!isPlaying && currentChangeIndex >= timelapseData.changes.length - 1) {
+      setCurrentChangeIndex(0);
     }
     setIsPlaying(!isPlaying);
   };
 
   const handleSliderChange = (value: number) => {
     if (!timelapseData) return;
-    setCurrentStateIndex(value);
-    setBoardState(timelapseData.states[value].fullState);
+    setCurrentChangeIndex(value);
   };
 
   const handleSpeedChange = (multiplier: number) => {
     setPlaybackSpeed(multiplier);
   };
 
-  const renderGrid = (currentPixel: Pixel, grid: (Pixel | null)[][]): JSX.Element => (
-    <div className="relative w-full overflow-auto">
-      <div 
-        className="relative w-full bg-gray-50 border border-gray-100 rounded-lg p-2"
-        style={{
-          width: isFullscreen ? '90vh' : '65vh',
-          height: isFullscreen ? '90vh' : '65vh',
-          margin: '0 auto',
-          aspectRatio: '1/1'
-        }}
-      >
-        <div
-          className="grid bg-white rounded-lg h-full"
+  const renderGrid = (grid: (Pixel | null)[][]): JSX.Element => {
+    const currentChange = timelapseData?.changes[currentChangeIndex];
+    
+    return (
+      <div className="relative w-full overflow-auto">
+        <div 
+          className="relative w-full bg-gray-50 border border-gray-100 rounded-lg p-2"
           style={{
-            gridTemplateColumns: `repeat(${currentSettings.boardSize}, 1fr)`,
-            gridTemplateRows: `repeat(${currentSettings.boardSize}, 1fr)`,
-            gap: '1px',
-            backgroundColor: '#E5E7EB'
+            width: isFullscreen ? '90vh' : '65vh',
+            height: isFullscreen ? '90vh' : '65vh',
+            margin: '0 auto',
+            aspectRatio: '1/1'
           }}
         >
-          {Array(currentSettings.boardSize).fill(null).map((_, x) =>
-            Array(currentSettings.boardSize).fill(null).map((_, y) => {
-              const pixel = grid[y][x];
-              return (
-                <div
-                  key={`${x}-${y}`}
-                  className={`w-full h-full ${
-                    x === currentPixel.x && y === currentPixel.y
-                      ? 'ring-2 ring-[#2C1810] ring-offset-[0.5px] z-20'
-                      : ''
-                  }`}
-                  style={{
-                    backgroundColor: pixel ? pixel.color : '#FFFFFF'
-                  }}
-                />
-              );
-            })
-          )}
+          <div
+            className="grid bg-white rounded-lg h-full"
+            style={{
+              gridTemplateColumns: `repeat(${currentSettings.boardSize}, 1fr)`,
+              gridTemplateRows: `repeat(${currentSettings.boardSize}, 1fr)`,
+              gap: '1px',
+              backgroundColor: '#E5E7EB'
+            }}
+          >
+            {Array(currentSettings.boardSize).fill(null).map((_, x) =>
+              Array(currentSettings.boardSize).fill(null).map((_, y) => {
+                const pixel = grid[y][x];
+                return (
+                  <div
+                    key={`${x}-${y}`}
+                    className={`w-full h-full ${
+                      currentChange && x === currentChange.x && y === currentChange.y
+                        ? 'ring-2 ring-[#2C1810] ring-offset-[0.5px] z-20'
+                        : ''
+                    }`}
+                    style={{
+                      backgroundColor: pixel ? pixel.color : '#FFFFFF'
+                    }}
+                  />
+                );
+              })
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderStats = (): JSX.Element | null => {
     if (!stats) return null;
@@ -243,14 +264,15 @@ export default function PixelBoardManager(): JSX.Element {
       );
     }
 
-    const currentPixel = timelapseData.states[currentStateIndex]?.pixel;
-    if (!currentPixel) return <div>No pixel data available</div>;
+    const currentChange = timelapseData.changes[currentChangeIndex];
+    if (!currentChange) return <div>No pixel data available</div>;
 
+    // Use the efficiently computed board state
     const grid = Array(currentSettings.boardSize)
       .fill(null)
       .map(() => Array(currentSettings.boardSize).fill(null));
 
-    boardState.forEach(pixel => {
+    currentBoardState.forEach(pixel => {
       if (pixel.x < currentSettings.boardSize && pixel.y < currentSettings.boardSize) {
         grid[pixel.y][pixel.x] = pixel;
       }
@@ -272,8 +294,8 @@ export default function PixelBoardManager(): JSX.Element {
             <input
               type="range"
               min={0}
-              max={timelapseData.states.length - 1}
-              value={currentStateIndex}
+              max={timelapseData.changes.length - 1}
+              value={currentChangeIndex}
               onChange={(e) => handleSliderChange(parseInt(e.target.value))}
               className="w-full"
             />
@@ -302,7 +324,7 @@ export default function PixelBoardManager(): JSX.Element {
 
         <div className="grid md:grid-cols-[1fr_300px] gap-4">
           <div className="bg-white rounded-lg shadow-sm">
-            {renderGrid(currentPixel, grid)}
+            {renderGrid(grid)}
           </div>
           <div className="space-y-4">
             <div className="bg-white p-4 rounded-lg shadow-sm">
@@ -310,14 +332,14 @@ export default function PixelBoardManager(): JSX.Element {
                 <div>
                   <span className="text-sm text-gray-500 block mb-1">Position</span>
                   <div className="flex items-center bg-gray-50 px-3 py-2 rounded">
-                    <span className="font-medium">{currentPixel.x}, {currentPixel.y}</span>
+                    <span className="font-medium">{currentChange.x}, {currentChange.y}</span>
                   </div>
                 </div>
                 <div>
                   <span className="text-sm text-gray-500 block mb-1">Timestamp</span>
                   <div className="flex items-center bg-gray-50 px-3 py-2 rounded">
                     <span className="font-medium text-sm">
-                      {new Date(timelapseData.states[currentStateIndex].timestamp).toLocaleTimeString()}
+                      {new Date(currentChange.timestamp).toLocaleTimeString()}
                     </span>
                   </div>
                 </div>
@@ -326,9 +348,9 @@ export default function PixelBoardManager(): JSX.Element {
                   <div className="flex items-center gap-3 bg-gray-50 px-3 py-2 rounded">
                     <div 
                       className="w-8 h-8 rounded-md border border-gray-200"
-                      style={{ backgroundColor: currentPixel.color }}
+                      style={{ backgroundColor: currentChange.color }}
                     />
-                    <code className="text-sm">{currentPixel.color}</code>
+                    <code className="text-sm">{currentChange.color}</code>
                   </div>
                 </div>
               </div>
@@ -337,14 +359,14 @@ export default function PixelBoardManager(): JSX.Element {
             <div className="bg-white p-4 rounded-lg shadow-sm">
               <h3 className="text-sm font-medium text-gray-700 mb-2">Progress</h3>
               <div className="flex justify-between items-center text-sm text-gray-600">
-                <span>{currentStateIndex + 1} / {timelapseData.states.length}</span>
-                <span>{Math.round((currentStateIndex / (timelapseData.states.length - 1)) * 100)}%</span>
+                <span>{currentChangeIndex + 1} / {timelapseData.changes.length}</span>
+                <span>{Math.round((currentChangeIndex / (timelapseData.changes.length - 1)) * 100)}%</span>
               </div>
               <div className="h-2 bg-gray-100 rounded-full mt-2 overflow-hidden">
                 <div 
                   className="h-full bg-[#2C1810] transition-all duration-300"
                   style={{
-                    width: `${(currentStateIndex / (timelapseData.states.length - 1)) * 100}%`
+                    width: `${(currentChangeIndex / (timelapseData.changes.length - 1)) * 100}%`
                   }}
                 />
               </div>

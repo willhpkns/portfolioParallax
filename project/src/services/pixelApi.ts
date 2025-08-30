@@ -42,15 +42,17 @@ export interface PixelBoardSettings {
   maintenanceMessage?: string;
 }
 
-export interface TimelapseState {
-  pixel: Pixel;
+export interface PixelChange {
+  x: number;
+  y: number;
+  color: string;
   timestamp: Date;
-  fullState: Pixel[];
 }
 
 export interface TimelapseData {
   totalPixels: number;
-  states: TimelapseState[];
+  changes: PixelChange[];
+  message?: string;
 }
 
 export interface Pixel {

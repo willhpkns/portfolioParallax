@@ -125,51 +125,35 @@ router.get('/history', isAdmin, async function(req, res) {
 // GET /api/pixels/history/timelapse - Get ordered history for timelapse
 router.get('/history/timelapse', isAdmin, async function(req, res) {
   try {
-    // Get limited recent history for timelapse (last 1000 pixels to avoid performance issues)
-    const limit = parseInt(req.query.limit) || 1000;
+    console.log('Starting timelapse data generation...');
+    const startTime = Date.now();
+    
+    // Get ALL pixel history, sorted chronologically
     const history = await PixelHistory.find()
-      .sort({ createdAt: -1 }) // Get most recent first
-      .limit(limit)
+      .sort({ createdAt: 1 })
       .select('x y color createdAt')
       .lean();
+    
+    console.log(`Fetched ${history.length} pixels in ${Date.now() - startTime}ms`);
 
-    // Reverse to get chronological order
-    history.reverse();
+    // Instead of storing full states, just store the changes
+    // Frontend will reconstruct states on-demand during playback
+    const changes = history.map(pixel => ({
+      x: pixel.x,
+      y: pixel.y,
+      color: pixel.color,
+      timestamp: pixel.createdAt
+    }));
 
-    // Calculate progressive states - but only store key snapshots to reduce payload
-    const states = [];
-    const currentState = new Map();
-    const snapshotInterval = Math.max(1, Math.floor(history.length / 100)); // Take ~100 snapshots max
-
-    history.forEach((pixel, index) => {
-      // Update current state with new pixel
-      const key = `${pixel.x},${pixel.y}`;
-      currentState.set(key, {
-        x: pixel.x,
-        y: pixel.y,
-        color: pixel.color
-      });
-
-      // Only create snapshots at intervals or for the last pixel
-      if (index % snapshotInterval === 0 || index === history.length - 1) {
-        states.push({
-          pixel: {
-            x: pixel.x,
-            y: pixel.y,
-            color: pixel.color
-          },
-          timestamp: pixel.createdAt,
-          fullState: Array.from(currentState.values())
-        });
-      }
-    });
+    console.log(`Processed timelapse data in ${Date.now() - startTime}ms total`);
 
     res.json({
       totalPixels: history.length,
-      states: states,
-      isLimited: history.length === limit
+      changes: changes, // Just the raw changes, not full states
+      message: `Loaded ${history.length} pixel changes`
     });
   } catch (err) {
+    console.error('Timelapse error:', err);
     res.status(500).json({ message: 'Error retrieving board state', error: err.message });
   }
 });
