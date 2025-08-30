@@ -9,6 +9,9 @@ const path = require('path');
 // Create Express app
 const app = express();
 
+// Trust proxy (required for rate limiting behind reverse proxy)
+app.set('trust proxy', 1);
+
 // Security middleware
 app.use(helmet({
   crossOriginEmbedderPolicy: false,
