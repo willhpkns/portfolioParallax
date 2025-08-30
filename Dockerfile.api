@@ -2,8 +2,8 @@
 FROM node:20-alpine
 WORKDIR /app
 COPY backend/package*.json ./
-RUN npm ci --omit=dev
+RUN npm install --production
 COPY backend/ .
 ENV PORT=5000
 EXPOSE 5000
-CMD ["npm","start"]   # change if your API uses a different start command
+CMD ["npm","start"]
