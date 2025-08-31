@@ -184,7 +184,69 @@ export default function Analytics() {
         </div>
       </div>
 
+      {/* Country Table/List */}
+      <div className="bg-white p-4 rounded-lg shadow">
+        <h3 className="text-lg font-semibold mb-4">Visitors by Country</h3>
+        <CountryTable locations={locations} />
+      </div>
+
       {/* Device Statistics */}
+// CountryTable component for expandable country/city visitor list
+function CountryTable({ locations }: { locations: LocationData[] }) {
+  const [expanded, setExpanded] = React.useState<{ [country: string]: boolean }>({});
+
+  const toggle = (country: string) => {
+    setExpanded(prev => ({ ...prev, [country]: !prev[country] }));
+  };
+
+  // Sort countries by totalVisits descending
+  const sorted = [...locations].sort((a, b) => (b.totalVisits || 0) - (a.totalVisits || 0));
+
+  return (
+    <table className="min-w-full bg-white rounded shadow">
+      <thead>
+        <tr>
+          <th className="px-4 py-2 text-left">Country</th>
+          <th className="px-4 py-2 text-left">Total Visitors</th>
+          <th className="px-4 py-2 text-left">Cities</th>
+        </tr>
+      </thead>
+      <tbody>
+        {sorted.map(country => (
+          <React.Fragment key={country._id}>
+            <tr className="hover:bg-gray-50 cursor-pointer" onClick={() => toggle(country._id)}>
+              <td className="px-4 py-2 font-medium flex items-center">
+                <span className="mr-2">{expanded[country._id] ? '▼' : '▶'}</span>
+                {country._id}
+              </td>
+              <td className="px-4 py-2">{country.totalVisits}</td>
+              <td className="px-4 py-2">
+                {country.cities.length}
+              </td>
+            </tr>
+            {expanded[country._id] && country.cities.length > 0 && (
+              <tr>
+                <td colSpan={3} className="px-8 py-2 bg-gray-50">
+                  <ul className="space-y-1">
+                    {country.cities
+                      .filter(city => city.count > 0)
+                      .sort((a, b) => b.count - a.count)
+                      .map(city => (
+                        <li key={city.name} className="flex justify-between">
+                          <span>{city.name}</span>
+                          <span>{city.count} visitor{city.count !== 1 ? 's' : ''}</span>
+                        </li>
+                    ))}
+                  </ul>
+                </td>
+              </tr>
+            )}
+          </React.Fragment>
+        ))}
+      </tbody>
+    </table>
+  );
+}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white p-4 rounded-lg shadow">
           <h3 className="text-lg font-semibold mb-4">Browsers</h3>
