@@ -191,6 +191,44 @@ export default function Analytics() {
       </div>
 
       {/* Device Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-lg font-semibold mb-4">Browsers</h3>
+          <div className="space-y-2">
+            {deviceStats?.browsers.map(browser => (
+              <div key={browser._id} className="flex justify-between">
+                <span>{browser._id}</span>
+                <span>{browser.count} visits</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="bg-white p-4 rounded-lg shadow">
+          <h3 className="text-lg font-semibold mb-4">Operating Systems</h3>
+          <div className="space-y-2">
+            {deviceStats?.operatingSystems.map(os => (
+              <div key={os._id} className="flex justify-between">
+                <span>{os._id}</span>
+                <span>{os.count} visits</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <AdminLayout>
+      {loading ? (
+        <div className="p-4">Loading analytics...</div>
+      ) : (
+        content
+      )}
+    </AdminLayout>
+  );
+}
+
 // CountryTable component for expandable country/city visitor list
 function CountryTable({ locations }: { locations: LocationData[] }) {
   const [expanded, setExpanded] = React.useState<{ [country: string]: boolean }>({});
@@ -245,42 +283,5 @@ function CountryTable({ locations }: { locations: LocationData[] }) {
         ))}
       </tbody>
     </table>
-  );
-}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-4">Browsers</h3>
-          <div className="space-y-2">
-            {deviceStats?.browsers.map(browser => (
-              <div key={browser._id} className="flex justify-between">
-                <span>{browser._id}</span>
-                <span>{browser.count} visits</span>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="bg-white p-4 rounded-lg shadow">
-          <h3 className="text-lg font-semibold mb-4">Operating Systems</h3>
-          <div className="space-y-2">
-            {deviceStats?.operatingSystems.map(os => (
-              <div key={os._id} className="flex justify-between">
-                <span>{os._id}</span>
-                <span>{os.count} visits</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
-  return (
-    <AdminLayout>
-      {loading ? (
-        <div className="p-4">Loading analytics...</div>
-      ) : (
-        content
-      )}
-    </AdminLayout>
   );
 }
