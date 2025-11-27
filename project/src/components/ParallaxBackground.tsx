@@ -90,10 +90,16 @@ export default function ParallaxBackground() {
   }, []);
 
   useEffect(() => {
+    let ticking = false;
+    
     const handleScroll = () => {
-      requestAnimationFrame(() => {
-        setScrollY(window.scrollY);
-      });
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          setScrollY(window.scrollY);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
 
     const handleResize = () => {
@@ -102,7 +108,7 @@ export default function ParallaxBackground() {
       });
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', handleResize);
     
     return () => {
@@ -119,7 +125,7 @@ export default function ParallaxBackground() {
       {circles.map((circle, i) => (
         <div
           key={i}
-          className="absolute rounded-full will-change-transform"
+          className="absolute rounded-full"
           style={{
             width: `${getResponsiveSize(circle.baseSize)}px`,
             height: `${getResponsiveSize(circle.baseSize)}px`,
@@ -128,12 +134,10 @@ export default function ParallaxBackground() {
             backgroundColor: circle.color,
             opacity: circle.opacity,
             filter: `blur(${(circle.depth * 2) + 2}px)`,
-            transform: `translate3d(
-              0px,
-              ${scrollY * circle.speed}px,
-              0
-            )`,
-            transition: 'transform 0.15s ease-out',
+            transform: `translate3d(0, ${scrollY * circle.speed}px, 0)`,
+            willChange: 'transform',
+            backfaceVisibility: 'hidden',
+            WebkitBackfaceVisibility: 'hidden',
             zIndex: Math.floor((1 - circle.depth) * 10),
           }}
         />
