@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, X, User, Mail, Code, FileText, Github, Linkedin, Grid } from 'lucide-react';
+import { Menu, X, User, Mail, Code, FileText, Github, Linkedin, Grid, ChefHat } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface SideMenuProps {
@@ -22,7 +22,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, toggleMenu }) => {
     e.preventDefault();
     toggleMenu();
 
-    if (path === '/resume' || path === '/pixelboard') {
+    if (path === '/resume' || path === '/pixelboard' || path === '/recipes') {
       navigate(path);
       return;
     }
@@ -47,6 +47,7 @@ const SideMenu: React.FC<SideMenuProps> = ({ isOpen, toggleMenu }) => {
     { icon: Code, text: 'Projects', path: '/projects' },
     { icon: FileText, text: 'Resume', path: '/resume' },
     { icon: Grid, text: 'Pixel Board', path: '/pixelboard' },
+    { icon: ChefHat, text: 'Recipes', path: '/recipes' },
     { icon: Mail, text: 'Contact', path: '/contact' },
   ];
 

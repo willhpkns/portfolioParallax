@@ -14,7 +14,8 @@ import {
   BarChart,
   Menu,
   X,
-  Grid
+  Grid,
+  ChefHat
 } from 'lucide-react';
 
 interface MenuChildItem {
@@ -59,6 +60,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     { path: '/admin/projects', label: 'Projects', icon: Code2 },
     { path: '/admin/analytics', label: 'Analytics', icon: BarChart },
     { path: '/admin/pixelboard', label: 'Pixel Board', icon: Grid },
+    { path: '/admin/recipes', label: 'Recipes', icon: ChefHat },
     {
       label: 'Resume',
       icon: FileText,

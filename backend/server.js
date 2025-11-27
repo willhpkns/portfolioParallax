@@ -107,6 +107,7 @@ const authRoutes = require('./routes/auth');
 const contentRoutes = require('./routes/content');
 const analyticsRoutes = require('./routes/analytics');
 const pixelRoutes = require('./routes/pixels');
+const recipeRoutes = require('./routes/recipes');
 
 console.log('Mounting auth routes...');
 app.use('/api/auth', authRoutes);
@@ -116,7 +117,11 @@ console.log('Mounting other routes...');
 app.use('/api/content', contentRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/pixels', pixelRoutes);
+app.use('/api/recipes', recipeRoutes);
 console.log('All routes mounted');
+
+// Serve uploaded files
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Debug: Print all registered routes
 console.log('\nRegistered Routes:');
