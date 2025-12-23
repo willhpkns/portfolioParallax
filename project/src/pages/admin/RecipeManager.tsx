@@ -10,6 +10,7 @@ import {
   getTotalCookingTime 
 } from '../../services/recipeApi';
 import { API_BASE_URL } from '../../services/api';
+import { Select } from '../../components/ui/Select';
 
 const CATEGORIES = ['breakfast', 'lunch', 'dinner', 'dessert', 'snack', 'drink', 'appetizer', 'side', 'other'] as const;
 const DIFFICULTIES = ['easy', 'medium', 'hard'] as const;
@@ -281,15 +282,12 @@ export default function RecipeManager() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Category</label>
-                <select
+                <Select
                   value={formData.category}
-                  onChange={e => setFormData({ ...formData, category: e.target.value as Recipe['category'] })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors appearance-none cursor-pointer"
-                >
-                  {CATEGORIES.map(cat => (
-                    <option key={cat} value={cat}>{getCategoryLabel(cat)}</option>
-                  ))}
-                </select>
+                  onChange={value => setFormData({ ...formData, category: value as Recipe['category'] })}
+                  options={CATEGORIES.map(cat => ({ value: cat, label: getCategoryLabel(cat) }))}
+                  className="w-full"
+                />
               </div>
             </div>
 
@@ -352,15 +350,12 @@ export default function RecipeManager() {
               </div>
               <div>
                 <label className="block text-sm font-medium mb-1">Difficulty</label>
-                <select
+                <Select
                   value={formData.difficulty}
-                  onChange={e => setFormData({ ...formData, difficulty: e.target.value as Recipe['difficulty'] })}
-                  className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors appearance-none cursor-pointer"
-                >
-                  {DIFFICULTIES.map(diff => (
-                    <option key={diff} value={diff}>{diff.charAt(0).toUpperCase() + diff.slice(1)}</option>
-                  ))}
-                </select>
+                  onChange={value => setFormData({ ...formData, difficulty: value as Recipe['difficulty'] })}
+                  options={DIFFICULTIES.map(diff => ({ value: diff, label: diff.charAt(0).toUpperCase() + diff.slice(1) }))}
+                  className="w-full"
+                />
               </div>
             </div>
 
@@ -423,13 +418,12 @@ export default function RecipeManager() {
                         className="w-16 border rounded px-2 py-1"
                         step="0.1"
                       />
-                      <select
+                      <Select
                         value={ing.metric.unit}
-                        onChange={e => updateIngredient(idx, 'metric.unit', e.target.value)}
-                        className="border border-gray-300 rounded px-2 py-1 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer"
-                      >
-                        {METRIC_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
-                      </select>
+                        onChange={value => updateIngredient(idx, 'metric.unit', value)}
+                        options={METRIC_UNITS.map(u => ({ value: u, label: u }))}
+                        className="w-20"
+                      />
                     </div>
                     <div className="flex items-center gap-1">
                       <span className="text-xs text-gray-500">Imperial:</span>
@@ -440,13 +434,12 @@ export default function RecipeManager() {
                         className="w-16 border rounded px-2 py-1"
                         step="0.1"
                       />
-                      <select
+                      <Select
                         value={ing.imperial.unit}
-                        onChange={e => updateIngredient(idx, 'imperial.unit', e.target.value)}
-                        className="border border-gray-300 rounded px-2 py-1 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer"
-                      >
-                        {IMPERIAL_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
-                      </select>
+                        onChange={value => updateIngredient(idx, 'imperial.unit', value)}
+                        options={IMPERIAL_UNITS.map(u => ({ value: u, label: u }))}
+                        className="w-20"
+                      />
                     </div>
                     <button
                       type="button"
