@@ -309,11 +309,14 @@ export default function RecipeManager() {
                 <label className="block text-sm font-medium mb-1">Prep Time (min)</label>
                 <input
                   type="number"
-                  value={formData.cookingTime.prep}
-                  onChange={e => setFormData({ 
-                    ...formData, 
-                    cookingTime: { ...formData.cookingTime, prep: parseInt(e.target.value) || 0 }
-                  })}
+                  value={formData.cookingTime.prep || ''}
+                  onChange={e => {
+                    const val = e.target.value;
+                    setFormData({ 
+                      ...formData, 
+                      cookingTime: { ...formData.cookingTime, prep: val === '' ? 0 : parseInt(val) }
+                    });
+                  }}
                   className="w-full border rounded-lg px-3 py-2"
                   min="0"
                 />
@@ -322,11 +325,14 @@ export default function RecipeManager() {
                 <label className="block text-sm font-medium mb-1">Cook Time (min)</label>
                 <input
                   type="number"
-                  value={formData.cookingTime.cook}
-                  onChange={e => setFormData({ 
-                    ...formData, 
-                    cookingTime: { ...formData.cookingTime, cook: parseInt(e.target.value) || 0 }
-                  })}
+                  value={formData.cookingTime.cook || ''}
+                  onChange={e => {
+                    const val = e.target.value;
+                    setFormData({ 
+                      ...formData, 
+                      cookingTime: { ...formData.cookingTime, cook: val === '' ? 0 : parseInt(val) }
+                    });
+                  }}
                   className="w-full border rounded-lg px-3 py-2"
                   min="0"
                 />
@@ -335,8 +341,11 @@ export default function RecipeManager() {
                 <label className="block text-sm font-medium mb-1">Servings</label>
                 <input
                   type="number"
-                  value={formData.servings}
-                  onChange={e => setFormData({ ...formData, servings: parseInt(e.target.value) || 1 })}
+                  value={formData.servings || ''}
+                  onChange={e => {
+                    const val = e.target.value;
+                    setFormData({ ...formData, servings: val === '' ? 1 : parseInt(val) });
+                  }}
                   className="w-full border rounded-lg px-3 py-2"
                   min="1"
                 />
