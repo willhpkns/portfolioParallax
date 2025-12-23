@@ -119,18 +119,18 @@ export default function Recipes() {
 
       <div className="container mx-auto px-4 py-8">
         {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-md p-4 mb-8">
-          <form onSubmit={handleSearch} className="flex gap-4 mb-4">
+        <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-6 mb-8">
+          <form onSubmit={handleSearch} className="flex gap-4 mb-6">
             <input
               type="text"
               value={searchInput}
               onChange={e => setSearchInput(e.target.value)}
-              placeholder="Search recipes..."
-              className="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#5C4B37]"
+              placeholder="Search recipes by name or ingredients..."
+              className="flex-1 border-2 border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#5C4B37] focus:border-transparent transition"
             />
             <button
               type="submit"
-              className="bg-[#5C4B37] text-white px-6 py-2 rounded-lg hover:bg-[#2C1810] transition"
+              className="bg-[#5C4B37] text-white px-8 py-3 rounded-lg hover:bg-[#2C1810] transition-all hover:shadow-md font-medium"
             >
               Search
             </button>
@@ -140,7 +140,7 @@ export default function Recipes() {
             <select
               value={category}
               onChange={e => { setCategory(e.target.value); setPagination(prev => ({ ...prev, page: 1 })); }}
-              className="border rounded-lg px-3 py-2"
+              className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#5C4B37] focus:border-transparent bg-white cursor-pointer transition"
             >
               {CATEGORIES.map(cat => (
                 <option key={cat.value} value={cat.value}>{cat.label}</option>
@@ -150,7 +150,7 @@ export default function Recipes() {
             <select
               value={difficulty}
               onChange={e => { setDifficulty(e.target.value); setPagination(prev => ({ ...prev, page: 1 })); }}
-              className="border rounded-lg px-3 py-2"
+              className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#5C4B37] focus:border-transparent bg-white cursor-pointer transition"
             >
               {DIFFICULTIES.map(diff => (
                 <option key={diff.value} value={diff.value}>{diff.label}</option>
@@ -158,11 +158,11 @@ export default function Recipes() {
             </select>
 
             <div className="flex items-center gap-2">
-              <label className="text-sm text-gray-600">Min Rating:</label>
+              <label className="text-sm font-medium text-gray-700">Min Rating:</label>
               <select
                 value={minRating}
                 onChange={e => { setMinRating(parseInt(e.target.value)); setPagination(prev => ({ ...prev, page: 1 })); }}
-                className="border rounded-lg px-3 py-2"
+                className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#5C4B37] focus:border-transparent bg-white cursor-pointer transition"
               >
                 <option value={0}>Any</option>
                 {[...Array(10)].map((_, i) => (
@@ -174,7 +174,7 @@ export default function Recipes() {
             <select
               value={sortBy}
               onChange={e => setSortBy(e.target.value)}
-              className="border rounded-lg px-3 py-2"
+              className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#5C4B37] focus:border-transparent bg-white cursor-pointer transition"
             >
               {SORT_OPTIONS.map(opt => (
                 <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -183,17 +183,19 @@ export default function Recipes() {
 
             <button
               onClick={clearFilters}
-              className="text-gray-500 hover:text-gray-700 text-sm underline"
+              className="text-[#5C4B37] hover:text-[#2C1810] text-sm font-medium underline transition"
             >
-              Clear filters
+              Clear all filters
             </button>
           </div>
         </div>
 
         {/* Results count */}
-        <p className="text-[#5C4B37] mb-4">
-          {pagination.total} recipe{pagination.total !== 1 ? 's' : ''} found
-        </p>
+        <div className="flex items-center justify-between mb-6">
+          <p className="text-[#5C4B37] font-medium">
+            <span className="text-2xl font-bold text-[#2C1810]">{pagination.total}</span> recipe{pagination.total !== 1 ? 's' : ''} found
+          </p>
+        </div>
 
         {error && (
           <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
@@ -207,9 +209,18 @@ export default function Recipes() {
             <p className="mt-4 text-[#5C4B37]">Loading recipes...</p>
           </div>
         ) : recipes.length === 0 ? (
-          <div className="text-center py-12 text-[#5C4B37]">
-            <p className="text-xl mb-2">No recipes found</p>
-            <p>Try adjusting your search or filters</p>
+          <div className="text-center py-16 bg-white/95 backdrop-blur-sm rounded-lg shadow-lg">
+            <svg className="w-20 h-20 mx-auto mb-4 text-[#E6D5AC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <p className="text-2xl font-bold mb-2 text-[#2C1810]">No recipes found</p>
+            <p className="text-[#5C4B37] mb-4">Try adjusting your search or filters</p>
+            <button
+              onClick={clearFilters}
+              className="bg-[#5C4B37] text-white px-6 py-2 rounded-lg hover:bg-[#2C1810] transition"
+            >
+              Clear all filters
+            </button>
           </div>
         ) : (
           <>
@@ -219,14 +230,15 @@ export default function Recipes() {
                 <Link
                   key={recipe._id}
                   to={`/recipes/${recipe._id}`}
-                  className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition group"
+                  className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group"
                 >
-                  <div className="relative h-48 bg-gray-200">
+                  <div className="relative h-48 bg-gray-200 overflow-hidden">
                     {recipe.photos.length > 0 ? (
                       <img
                         src={getPhotoUrl(recipe.photos[0])}
                         alt={recipe.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                        className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+                        loading="lazy"
                       />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center text-gray-400">
@@ -235,28 +247,34 @@ export default function Recipes() {
                         </svg>
                       </div>
                     )}
-                    <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-sm font-bold text-[#5C4B37]">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute top-3 right-3 bg-white/95 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold text-[#5C4B37] shadow-md">
                       {recipe.rating}/10 ★
                     </div>
                   </div>
-                  <div className="p-4">
-                    <h3 className="font-semibold text-lg mb-2 group-hover:text-[#5C4B37] transition">
+                  <div className="p-5">
+                    <h3 className="font-bold text-lg mb-2 group-hover:text-[#5C4B37] transition text-gray-900">
                       {recipe.title}
                     </h3>
+                    {recipe.description && (
+                      <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                        {recipe.description}
+                      </p>
+                    )}
                     <div className="flex flex-wrap gap-2 mb-3">
-                      <span className="text-xs bg-[#E6D5AC] text-[#2C1810] px-2 py-1 rounded-full">
+                      <span className="text-xs bg-[#E6D5AC] text-[#2C1810] px-3 py-1 rounded-full font-medium">
                         {getCategoryLabel(recipe.category)}
                       </span>
-                      <span className={`text-xs px-2 py-1 rounded-full ${getDifficultyColor(recipe.difficulty)}`}>
+                      <span className={`text-xs px-3 py-1 rounded-full font-medium ${getDifficultyColor(recipe.difficulty)}`}>
                         {recipe.difficulty}
                       </span>
                     </div>
-                    <div className="flex items-center text-sm text-[#5C4B37]">
+                    <div className="flex items-center text-sm text-[#5C4B37] font-medium">
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
                       {formatCookingTime(getTotalCookingTime(recipe))}
-                      <span className="mx-2">•</span>
+                      <span className="mx-2 text-gray-400">•</span>
                       <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
                       </svg>
@@ -269,23 +287,23 @@ export default function Recipes() {
 
             {/* Pagination */}
             {pagination.pages > 1 && (
-              <div className="flex justify-center gap-2 mt-8">
+              <div className="flex justify-center items-center gap-3 mt-10">
                 <button
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                   disabled={pagination.page === 1}
-                  className="px-4 py-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+                  className="px-6 py-2 rounded-lg bg-white/95 backdrop-blur-sm shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#5C4B37] hover:text-white transition-all font-medium"
                 >
-                  Previous
+                  ← Previous
                 </button>
-                <span className="px-4 py-2">
+                <span className="px-4 py-2 bg-white/95 backdrop-blur-sm rounded-lg shadow-md font-medium text-[#2C1810]">
                   Page {pagination.page} of {pagination.pages}
                 </span>
                 <button
                   onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                   disabled={pagination.page === pagination.pages}
-                  className="px-4 py-2 rounded-lg border disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100"
+                  className="px-6 py-2 rounded-lg bg-white/95 backdrop-blur-sm shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed hover:bg-[#5C4B37] hover:text-white transition-all font-medium"
                 >
-                  Next
+                  Next →
                 </button>
               </div>
             )}
