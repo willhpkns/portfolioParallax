@@ -134,13 +134,13 @@ export default function RecipeDetail() {
           <div className="lg:col-span-2 space-y-8">
             {/* Description */}
             {recipe.description && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <p className="text-gray-700 leading-relaxed">{recipe.description}</p>
+              <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-6">
+                <p className="text-gray-900 leading-relaxed">{recipe.description}</p>
               </div>
             )}
 
             {/* Instructions */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-6">
               <h2 className="text-2xl font-bold mb-4 text-[#2C1810]">Instructions</h2>
               <ol className="space-y-4">
                 {recipe.instructions.map((step, idx) => (
@@ -148,7 +148,7 @@ export default function RecipeDetail() {
                     <span className="flex-shrink-0 w-8 h-8 bg-[#E6D5AC] text-[#2C1810] rounded-full flex items-center justify-center font-bold">
                       {idx + 1}
                     </span>
-                    <p className="text-gray-700 pt-1">{step}</p>
+                    <p className="text-gray-900 pt-1">{step}</p>
                   </li>
                 ))}
               </ol>
@@ -156,13 +156,13 @@ export default function RecipeDetail() {
 
             {/* Review */}
             {recipe.review && (
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-6">
                 <h2 className="text-2xl font-bold mb-4 text-[#2C1810]">My Review</h2>
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0 w-16 h-16 bg-[#E6D5AC] rounded-full flex items-center justify-center">
                     <span className="text-2xl font-bold text-[#5C4B37]">{recipe.rating}</span>
                   </div>
-                  <p className="text-gray-700 leading-relaxed">{recipe.review}</p>
+                  <p className="text-gray-900 leading-relaxed">{recipe.review}</p>
                 </div>
               </div>
             )}
@@ -171,7 +171,7 @@ export default function RecipeDetail() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Quick Info */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-6">
               <h3 className="font-bold text-lg mb-4 text-[#2C1810]">Quick Info</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div className="text-center p-3 bg-[#F5EDE0] rounded-lg">
@@ -194,7 +194,7 @@ export default function RecipeDetail() {
             </div>
 
             {/* Ingredients */}
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-bold text-lg text-[#2C1810]">Ingredients</h3>
                 <div className="flex bg-[#F5EDE0] rounded-lg p-1">
@@ -221,7 +221,7 @@ export default function RecipeDetail() {
                   const measurement = useMetric ? ing.metric : ing.imperial;
                   return (
                     <li key={idx} className="flex justify-between items-center py-2 border-b border-[#E6D5AC] last:border-0">
-                      <span className="text-gray-700">{ing.name}</span>
+                      <span className="text-gray-900">{ing.name}</span>
                       <span className="font-medium text-[#5C4B37]">
                         {measurement.amount} {measurement.unit}
                       </span>
@@ -233,7 +233,7 @@ export default function RecipeDetail() {
 
             {/* Tags */}
             {recipe.tags.length > 0 && (
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-6">
                 <h3 className="font-bold text-lg mb-3 text-[#2C1810]">Tags</h3>
                 <div className="flex flex-wrap gap-2">
                   {recipe.tags.map(tag => (
@@ -247,7 +247,7 @@ export default function RecipeDetail() {
 
             {/* Photo Gallery Thumbnails */}
             {recipe.photos.length > 1 && (
-              <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-6">
                 <h3 className="font-bold text-lg mb-3 text-[#2C1810]">Photos</h3>
                 <div className="grid grid-cols-3 gap-2">
                   {recipe.photos.map((photo, idx) => (
