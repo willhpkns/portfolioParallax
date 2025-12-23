@@ -284,7 +284,7 @@ export default function RecipeManager() {
                 <select
                   value={formData.category}
                   onChange={e => setFormData({ ...formData, category: e.target.value as Recipe['category'] })}
-                  className="w-full border rounded-lg px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors appearance-none cursor-pointer"
                 >
                   {CATEGORIES.map(cat => (
                     <option key={cat} value={cat}>{getCategoryLabel(cat)}</option>
@@ -355,7 +355,7 @@ export default function RecipeManager() {
                 <select
                   value={formData.difficulty}
                   onChange={e => setFormData({ ...formData, difficulty: e.target.value as Recipe['difficulty'] })}
-                  className="w-full border rounded-lg px-3 py-2"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors appearance-none cursor-pointer"
                 >
                   {DIFFICULTIES.map(diff => (
                     <option key={diff} value={diff}>{diff.charAt(0).toUpperCase() + diff.slice(1)}</option>
@@ -426,7 +426,7 @@ export default function RecipeManager() {
                       <select
                         value={ing.metric.unit}
                         onChange={e => updateIngredient(idx, 'metric.unit', e.target.value)}
-                        className="border rounded px-2 py-1"
+                        className="border border-gray-300 rounded px-2 py-1 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer"
                       >
                         {METRIC_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
                       </select>
@@ -443,7 +443,7 @@ export default function RecipeManager() {
                       <select
                         value={ing.imperial.unit}
                         onChange={e => updateIngredient(idx, 'imperial.unit', e.target.value)}
-                        className="border rounded px-2 py-1"
+                        className="border border-gray-300 rounded px-2 py-1 bg-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors cursor-pointer"
                       >
                         {IMPERIAL_UNITS.map(u => <option key={u} value={u}>{u}</option>)}
                       </select>
