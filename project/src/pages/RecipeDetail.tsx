@@ -16,6 +16,7 @@ export default function RecipeDetail() {
   const [error, setError] = useState<string | null>(null);
   const [useMetric, setUseMetric] = useState(true);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [adjustedServings, setAdjustedServings] = useState<number>(0);
 
   useEffect(() => {
     if (id) fetchRecipe();
@@ -26,6 +27,7 @@ export default function RecipeDetail() {
       setLoading(true);
       const data = await recipeApi.getRecipe(id!);
       setRecipe(data);
+      setAdjustedServings(data.servings); // Initialize with original servings
       setError(null);
     } catch (err) {
       setError('Failed to load recipe');
@@ -186,9 +188,28 @@ export default function RecipeDetail() {
                   <p className="text-sm text-[#5C4B37]">Total Time</p>
                   <p className="font-bold text-lg text-[#2C1810]">{formatCookingTime(recipe.cookingTime.prep + recipe.cookingTime.cook)}</p>
                 </div>
-                <div className="text-center p-3 bg-[#F5EDE0] rounded-lg">
-                  <p className="text-sm text-[#5C4B37]">Servings</p>
-                  <p className="font-bold text-lg text-[#2C1810]">{recipe.servings}</p>
+                <div className="col-span-2 text-center p-3 bg-[#F5EDE0] rounded-lg">
+                  <p className="text-sm text-[#5C4B37] mb-2">Servings</p>
+                  <div className="flex items-center justify-center gap-3">
+                    <button
+                      onClick={() => setAdjustedServings(Math.max(1, adjustedServings - 1))}
+                      className="w-8 h-8 rounded-full bg-white hover:bg-[#5C4B37] hover:text-white transition flex items-center justify-center font-bold shadow"
+                    >
+                      −
+                    </button>
+                    <span className="font-bold text-2xl text-[#2C1810] min-w-[3rem]">{adjustedServings}</span>
+                    <button
+                      onClick={() => setAdjustedServings(adjustedServings + 1)}
+                      className="w-8 h-8 rounded-full bg-white hover:bg-[#5C4B37] hover:text-white transition flex items-center justify-center font-bold shadow"
+                    >
+                      +
+                    </button>
+                  </div>
+                  {adjustedServings !== recipe.servings && (
+                    <p className="text-xs text-[#5C4B37] mt-2">
+                      Original: {recipe.servings} servings
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -219,11 +240,13 @@ export default function RecipeDetail() {
               <ul className="space-y-3">
                 {recipe.ingredients.map((ing, idx) => {
                   const measurement = useMetric ? ing.metric : ing.imperial;
+                  const multiplier = adjustedServings / recipe.servings;
+                  const scaledAmount = (measurement.amount * multiplier).toFixed(2).replace(/\.?0+$/, '');
                   return (
                     <li key={idx} className="flex justify-between items-center py-2 border-b border-[#E6D5AC] last:border-0">
                       <span className="text-gray-900">{ing.name}</span>
                       <span className="font-medium text-[#5C4B37]">
-                        {measurement.amount} {measurement.unit}
+                        {scaledAmount} {measurement.unit}
                       </span>
                     </li>
                   );
