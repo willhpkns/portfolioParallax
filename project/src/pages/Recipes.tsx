@@ -10,6 +10,7 @@ import {
   getTotalCookingTime 
 } from '../services/recipeApi';
 import { API_BASE_URL } from '../services/api';
+import { Select } from '../components/ui/Select';
 
 const CATEGORIES = [
   { value: 'all', label: 'All Categories' },
@@ -137,49 +138,39 @@ export default function Recipes() {
           </form>
 
           <div className="flex flex-wrap gap-4 items-center">
-            <select
+            <Select
               value={category}
-              onChange={e => { setCategory(e.target.value); setPagination(prev => ({ ...prev, page: 1 })); }}
-              className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#5C4B37] focus:border-transparent bg-white cursor-pointer transition"
-            >
-              {CATEGORIES.map(cat => (
-                <option key={cat.value} value={cat.value}>{cat.label}</option>
-              ))}
-            </select>
+              onChange={value => { setCategory(value); setPagination(prev => ({ ...prev, page: 1 })); }}
+              options={CATEGORIES}
+              className="min-w-[180px]"
+            />
 
-            <select
+            <Select
               value={difficulty}
-              onChange={e => { setDifficulty(e.target.value); setPagination(prev => ({ ...prev, page: 1 })); }}
-              className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#5C4B37] focus:border-transparent bg-white cursor-pointer transition"
-            >
-              {DIFFICULTIES.map(diff => (
-                <option key={diff.value} value={diff.value}>{diff.label}</option>
-              ))}
-            </select>
+              onChange={value => { setDifficulty(value); setPagination(prev => ({ ...prev, page: 1 })); }}
+              options={DIFFICULTIES}
+              className="min-w-[150px]"
+            />
 
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium text-gray-700">Min Rating:</label>
-              <select
-                value={minRating}
-                onChange={e => { setMinRating(parseInt(e.target.value)); setPagination(prev => ({ ...prev, page: 1 })); }}
-                className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#5C4B37] focus:border-transparent bg-white cursor-pointer transition"
-              >
-                <option value={0}>Any</option>
-                {[...Array(10)].map((_, i) => (
-                  <option key={i + 1} value={i + 1}>{i + 1}+ ★</option>
-                ))}
-              </select>
+              <Select
+                value={minRating.toString()}
+                onChange={value => { setMinRating(parseInt(value)); setPagination(prev => ({ ...prev, page: 1 })); }}
+                options={[
+                  { value: '0', label: 'Any' },
+                  ...[...Array(10)].map((_, i) => ({ value: (i + 1).toString(), label: `${i + 1}+ ★` }))
+                ]}
+                className="min-w-[100px]"
+              />
             </div>
 
-            <select
+            <Select
               value={sortBy}
-              onChange={e => setSortBy(e.target.value)}
-              className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#5C4B37] focus:border-transparent bg-white cursor-pointer transition"
-            >
-              {SORT_OPTIONS.map(opt => (
-                <option key={opt.value} value={opt.value}>{opt.label}</option>
-              ))}
-            </select>
+              onChange={value => setSortBy(value)}
+              options={SORT_OPTIONS}
+              className="min-w-[150px]"
+            />
 
             <button
               onClick={clearFilters}
