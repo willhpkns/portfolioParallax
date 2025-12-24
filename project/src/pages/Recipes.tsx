@@ -137,7 +137,7 @@ export default function Recipes() {
             </button>
           </form>
 
-          <div className="flex flex-wrap gap-4 items-center relative z-20">
+          <div className="flex flex-wrap gap-4 items-center relative z-[100]">
             <Select
               value={category}
               onChange={value => { setCategory(value); setPagination(prev => ({ ...prev, page: 1 })); }}
