@@ -15,5 +15,8 @@
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
+  },
+  "dependencies": {
+    "react-simple-maps": "^3.0.0"
   }
 }

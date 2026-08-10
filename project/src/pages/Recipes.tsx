@@ -120,7 +120,7 @@ export default function Recipes() {
 
       <div className="container mx-auto px-4 py-8">
         {/* Search and Filters */}
-        <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-6 mb-8">
+        <div className="bg-white/95 backdrop-blur-sm rounded-lg shadow-lg p-6 mb-8 overflow-visible">
           <form onSubmit={handleSearch} className="flex gap-4 mb-6">
             <input
               type="text"

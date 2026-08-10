@@ -31,7 +31,7 @@ app.use(globalLimiter);
 // Basic middleware
 console.log('Setting up middleware...');
 app.use(cors({
-  origin: ['http://localhost:5173', 'https://willhpkns.soon.it'],
+  origin: ['http://localhost:5173', 'http://localhost:5174', 'https://willhpkns.soon.it'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept']
